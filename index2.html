@@ -3,81 +3,94 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TripMate — Lifestyle Social Prototype</title>
+  <title>TripMate — Lifestyle Social Prototype (Vertical Feed)</title>
+  <meta name="description" content="TripMate: ฟีดแนวตั้งเหมือน IG/Lemon8 + ค้นหา + กลุ่มโหวต + สรุปทริป + รางวัล/ของตกแต่งโปรไฟล์ + โปรไฟล์ + ส่งฟีดแบ็ก (Google Form)" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* ซ่อนสกอร์ลบาร์แนวนอน */
     .no-scrollbar::-webkit-scrollbar{display:none}
     .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
-    .line-clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-    .glass{backdrop-filter: blur(8px); background: rgba(255,255,255,.6)}
+    /* line clamp */
+    .line-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .line-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    /* Lemon8-like masonry: ใช้ CSS columns + break-inside */
+    .masonry { column-count: 2; column-gap: 0.75rem; }
+    @media (min-width:640px){ .masonry { column-count: 3; } }
+    @media (min-width:1024px){ .masonry { column-count: 4; } }
+    .masonry-item { break-inside: avoid; margin-bottom: 0.75rem; }
+    /* โปรไฟล์ธีมพื้นหลัง */
+    .theme-basic { background-image: linear-gradient(140deg,#f8fafc 0%,#ffffff 100%); }
+    .theme-forest{ background-image: linear-gradient(140deg,#e8f5e9 0%,#e0f2f1 100%); }
+    .theme-sunset{ background-image: linear-gradient(140deg,#fff1f2 0%,#fef3c7 100%); }
+    .theme-night { background-image: linear-gradient(140deg,#0f172a 0%,#1f2937 100%); color:#e5e7eb; }
+    /* กรอบอวาตาร์ */
+    .frame-none {}
+    .frame-gold { box-shadow: 0 0 0 3px #f59e0b inset, 0 0 0 5px #fff; border-radius:999px; }
+    .frame-neo  { box-shadow: 0 0 0 3px #06b6d4 inset, 0 0 0 5px #fff; border-radius:18px; }
+    .frame-pastel { box-shadow: 0 0 0 3px #a78bfa inset, 0 0 0 5px #fff; border-radius:999px; }
+    /* สติ๊กเกอร์บนโปรไฟล์ */
+    .sticker { position:absolute; transform: rotate(-10deg); }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
 
-  <!-- TOP BAR: lifestyle style -->
+  <!-- Top Bar -->
   <header class="sticky top-0 z-40 border-b bg-white/80 backdrop-blur">
-    <div class="max-w-4xl mx-auto px-4 py-2 flex items-center gap-3">
+    <div class="max-w-5xl mx-auto px-4 py-2 flex items-center gap-3">
       <div class="flex items-center gap-2 flex-1">
         <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-500 text-white grid place-items-center font-bold">T</div>
         <div class="font-extrabold tracking-tight">TripMate</div>
-        <!-- search pill -->
-        <div class="hidden sm:flex items-center gap-2 ml-3 flex-1 max-w-md glass rounded-full px-3 py-1.5 border">
+        <div class="hidden sm:flex items-center gap-2 ml-3 flex-1 max-w-md rounded-full px-3 py-1.5 border bg-white/60">
           <span>🔎</span>
-          <input id="topSearch" class="bg-transparent outline-none text-sm w-full" placeholder="ค้นหาไอเดีย · คาเฟ่ · ที่เที่ยว" />
+          <input id="topSearch" class="bg-transparent outline-none text-sm w-full" placeholder="ค้นหาคาเฟ่ · ที่เที่ยว · รีวิว" />
         </div>
       </div>
       <a href="https://forms.gle/JuJ2WWLeiRyTQSNU6" target="_blank" rel="noopener"
          class="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition rounded-full px-4 py-1.5 text-sm">
-        ส่งฟีดแบ็ก
+         ส่งฟีดแบ็ก
       </a>
     </div>
   </header>
 
-  <!-- PAGE -->
-  <main class="max-w-4xl mx-auto px-4 py-4 pb-28">
+  <!-- Main -->
+  <main class="max-w-5xl mx-auto px-4 py-4 pb-28">
     <!-- DISCOVER -->
     <section id="page-discover" class="space-y-4">
-
-      <!-- Stories / Topics rail -->
       <div class="flex items-center justify-between">
-        <div class="font-semibold">For you</div>
-        <button id="openCreatePost" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-4 py-2 text-sm">+ โพสต์รีวิว</button>
+        <div class="font-semibold">สำหรับคุณ (For you)</div>
+        <div class="flex items-center gap-2">
+          <button id="openCreatePost" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-4 py-2 text-sm">+ โพสต์รีวิว</button>
+          <button id="toggleView" class="border rounded-full px-3 py-2 text-sm">โหมด: ภาพแนวตั้ง</button>
+        </div>
       </div>
-      <div id="storiesRail" class="flex gap-3 overflow-x-auto no-scrollbar pb-1"></div>
 
-      <!-- Banners (promos & hashtags) -->
+      <!-- แบนเนอร์/แฮชแท็ก -->
       <div id="promoBanners" class="flex gap-3 overflow-x-auto no-scrollbar"></div>
-      <div class="flex items-center justify-between">
-        <div class="text-sm text-gray-700 flex items-center gap-2">🔥 แฮชแท็กยอดนิยม</div>
-        <div class="text-xs text-gray-500">ปรับ feed ตามสิ่งที่คุณสนใจ</div>
-      </div>
       <div id="topTags" class="flex gap-2 overflow-x-auto no-scrollbar"></div>
 
-      <!-- Mode toggle -->
-      <div class="flex items-center gap-2 mt-1">
-        <button id="modePostsBtn" class="bg-blue-600 text-white rounded-full px-3 py-1.5 text-sm">โพสต์ล่าสุด</button>
-        <button id="modeTilesBtn" class="border border-gray-300 rounded-full px-3 py-1.5 text-sm">สรุปสถานที่</button>
-      </div>
-
-      <!-- FEED / TILES -->
-      <div id="discoverContent" class="grid grid-cols-1 gap-3"></div>
+      <!-- ฟีด: โหมดภาพแนวตั้ง (masonry) / โหมดสรุปสถานที่ (tiles) -->
+      <div id="discoverMasonry" class="masonry"></div>
+      <div id="discoverTiles" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
     </section>
 
     <!-- SEARCH -->
     <section id="page-search" class="hidden space-y-3">
       <div class="flex items-center gap-2">
         <div class="relative flex-1">
-          <input id="searchInput" class="w-full border rounded-xl pl-9 pr-3 py-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="ค้นหาที่เที่ยว คาเฟ่ ร้านอาหาร...">
+          <input id="searchInput" class="w-full border rounded-xl pl-9 pr-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                 placeholder="ค้นหาที่เที่ยว คาเฟ่ ร้านอาหาร...">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">🔎</span>
         </div>
         <button id="applySearchBtn" class="border rounded-full px-3 py-2">ค้นหา🔎</button>
       </div>
       <div id="categoryChips" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
       <div id="provinceChips" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
-      <div class="flex items-center gap-3 text-sm text-gray-600"><span>🧭 ระยะทางสูงสุด:</span> <span id="distVal">80</span> กม.</div>
+      <div class="flex items-center gap-3 text-sm text-gray-600">
+        <span>🧭 ระยะทางสูงสุด:</span> <span id="distVal">80</span> กม.
+      </div>
       <input id="distSlider" type="range" min="5" max="200" step="5" value="80" class="w-full accent-blue-600" />
       <div id="locInfo" class="text-xs text-gray-500"></div>
-      <div id="searchResults" class="grid grid-cols-1 gap-3"></div>
+      <div id="searchResults" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
     </section>
 
     <!-- GROUPS -->
@@ -95,36 +108,55 @@
         </div>
         <div class="text-4xl">🏅</div>
       </div>
-      <div id="rewardsList" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+
+      <div class="font-semibold">ของรางวัล</div>
+      <div id="rewardsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+      <div class="font-semibold">ของตกแต่งโปรไฟล์ (ใหม่)</div>
+      <div id="cosmeticsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
     </section>
 
     <!-- PROFILE -->
     <section id="page-profile" class="hidden space-y-4">
-      <div class="bg-white border rounded-2xl p-4 flex items-center justify-between">
-        <div>
-          <div class="text-xl font-semibold">
-            <span id="userNameEl">ผู้ใช้</span>
-            <span id="userHandleEl" class="text-sm text-gray-500">@handle</span>
+      <div id="profileCard" class="relative bg-white border rounded-2xl overflow-hidden">
+        <div id="profileTheme" class="h-24 theme-basic"></div>
+        <div class="p-4 pt-0">
+          <div class="relative -mt-8 flex items-center gap-3">
+            <div id="avatarWrap" class="w-16 h-16 rounded-full bg-white grid place-items-center overflow-hidden frame-none">
+              <img id="avatarImg" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop" class="w-full h-full object-cover"/>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xl font-semibold">
+                <span id="userNameEl">แทมมี่</span>
+                <span id="userHandleEl" class="text-sm text-gray-500">@tammy</span>
+              </div>
+              <div id="userMetaEl" class="text-sm text-gray-500">ระดับ: Explorer · แต้ม: 0 · แบดจ์: -</div>
+            </div>
           </div>
-          <div id="userMetaEl" class="text-sm text-gray-500">ระดับ: - · แต้ม: - · แบดจ์: -</div>
+          <div id="profileStickers" class="relative h-0"></div>
+          <div class="mt-3">
+            <div class="font-semibold mb-2">รีวิวของฉัน</div>
+            <div id="myReviews" class="space-y-2"></div>
+          </div>
         </div>
-        <div class="text-4xl">👤</div>
       </div>
-      <div>
-        <div class="font-semibold mb-2">รีวิวของฉัน</div>
-        <div id="myReviews" class="space-y-2"></div>
+
+      <!-- เลือกของตกแต่งที่ครอบครอง -->
+      <div class="bg-white border rounded-2xl p-4 space-y-3">
+        <div class="font-semibold">ของตกแต่งที่ครอบครอง</div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="ownedCosmetics"></div>
       </div>
     </section>
   </main>
 
-  <!-- FAB -->
+  <!-- Floating Create -->
   <button id="fabCreate" class="fixed bottom-20 right-5 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg px-4 py-3 text-sm">
     + รีวิว
   </button>
 
   <!-- Bottom Nav -->
   <nav class="fixed bottom-0 inset-x-0 bg-white border-t z-40">
-    <div class="max-w-4xl mx-auto grid grid-cols-5 text-sm">
+    <div class="max-w-5xl mx-auto grid grid-cols-5 text-sm">
       <button data-tab="discover" class="py-3 flex flex-col items-center text-blue-600">🏠<span class="text-xs">ฟีด</span></button>
       <button data-tab="search" class="py-3 flex flex-col items-center text-gray-600">🔎<span class="text-xs">ค้นหา</span></button>
       <button data-tab="groups" class="py-3 flex flex-col items-center text-gray-600">👥<span class="text-xs">กลุ่ม</span></button>
@@ -133,7 +165,7 @@
     </div>
   </nav>
 
-  <!-- Modals -->
+  <!-- Detail Modal -->
   <div id="detailModal" class="hidden fixed inset-0 bg-black/50 z-50 p-4">
     <div class="bg-white w-full max-w-2xl mx-auto mt-[10vh] rounded-2xl p-4">
       <div class="flex items-center justify-between mb-2">
@@ -144,6 +176,7 @@
     </div>
   </div>
 
+  <!-- Create Modal -->
   <div id="createModal" class="hidden fixed inset-0 bg-black/50 z-50 p-4">
     <div class="bg-white w-full max-w-lg mx-auto mt-[10vh] rounded-2xl p-4">
       <div class="flex items-center justify-between mb-2">
@@ -165,7 +198,7 @@
         </div>
         <div id="verifyHint" class="text-sm text-gray-500">* เปิดตำแหน่งใกล้สถานที่เพื่อรับสถานะ Verified</div>
         <div class="flex items-center justify-end gap-2">
-          <button id="cancelCreate" class="border border-gray-300 rounded-2xl px-4 py-2">ยกเลิก</button>
+          <button id="cancelCreate" class="border rounded-2xl px-4 py-2">ยกเลิก</button>
           <button id="submitCreate" class="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-4 py-2">โพสต์</button>
         </div>
       </div>
@@ -173,30 +206,64 @@
   </div>
 
   <script>
-    /* ---------- Data (เหมือนเดิม) ---------- */
-    const currentUser = { id:"u_me", name:"แทมมี่", handle:"@tammy", level:"Explorer", points:520, badges:["Verified Explorer"] };
+    // -------- Mock Data --------
+    const currentUser = { id:"u_me", name:"แทมมี่", handle:"@tammy", level:"Explorer", points:820, badges:["Verified Explorer"] };
     const places = [
-      { id:"p_khaotao", name:"อ่างเก็บน้ำเขาเต่า", province:"ประจวบคีรีขันธ์", category:"ธรรมชาติ", lat:12.5032, lng:99.9886, openingHours:"06:00–18:30", tags:["วิวสวย","ถ่ายรูป","พระอาทิตย์ตก"], rating:4.8, crowd:"ปานกลาง", photos:["https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop"] },
-      { id:"p_somewhere_cnx", name:"Somewhere Cafe", province:"เชียงใหม่", category:"คาเฟ่", lat:18.7953, lng:98.9525, openingHours:"09:00–18:00", tags:["คาเฟ่วิวดี","กาแฟหอม","ภูเขา"], rating:4.5, crowd:"น้อย", photos:["https://images.unsplash.com/photo-1498654896293-37aacf113fd9?q=80&w=1200&auto=format&fit=crop"] },
-      { id:"p_monjam", name:"ม่อนแจ่ม", province:"เชียงใหม่", category:"ธรรมชาติ", lat:18.9370, lng:98.8590, openingHours:"05:30–19:00", tags:["ภูเขา","อากาศเย็น","วิวพาโนรามา"], rating:4.7, crowd:"มาก", photos:["https://images.unsplash.com/photo-1528821154947-1aa3d1b749b3?q=80&w=1200&auto=format&fit=crop"] },
-      { id:"p_doisuthep", name:"ดอยสุเทพ", province:"เชียงใหม่", category:"แลนด์มาร์ก", lat:18.8047, lng:98.9215, openingHours:"06:00–20:00", tags:["วัด","จุดชมวิว"], rating:4.6, crowd:"มาก", photos:["https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=1200&auto=format&fit=crop"] },
-      { id:"p_bangsaen", name:"หาดบางแสน", province:"ชลบุรี", category:"ธรรมชาติ", lat:13.2756, lng:100.9255, openingHours:"24 ชั่วโมง", tags:["ทะเล","ครอบครัว","ของกินเยอะ"], rating:4.1, crowd:"มาก", photos:["https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1200&auto=format&fit=crop"] },
+      { id:"p_khaotao", name:"อ่างเก็บน้ำเขาเต่า", province:"ประจวบคีรีขันธ์", category:"ธรรมชาติ", lat:12.5032, lng:99.9886, openingHours:"06:00–18:30", tags:["วิวสวย","ถ่ายรูป","พระอาทิตย์ตก"], rating:4.8, crowd:"ปานกลาง", photos:[
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop"
+      ] },
+      { id:"p_somewhere_cnx", name:"Somewhere Cafe", province:"เชียงใหม่", category:"คาเฟ่", lat:18.7953, lng:98.9525, openingHours:"09:00–18:00", tags:["คาเฟ่วิวดี","กาแฟหอม","ภูเขา"], rating:4.5, crowd:"น้อย", photos:[
+        "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop"
+      ] },
+      { id:"p_monjam", name:"ม่อนแจ่ม", province:"เชียงใหม่", category:"ธรรมชาติ", lat:18.9370, lng:98.8590, openingHours:"05:30–19:00", tags:["ภูเขา","อากาศเย็น","วิวพาโนรามา"], rating:4.7, crowd:"มาก", photos:[
+        "https://images.unsplash.com/photo-1528821154947-1aa3d1b749b3?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop"
+      ] },
+      { id:"p_doisuthep", name:"ดอยสุเทพ", province:"เชียงใหม่", category:"แลนด์มาร์ก", lat:18.8047, lng:98.9215, openingHours:"06:00–20:00", tags:["วัด","จุดชมวิว"], rating:4.6, crowd:"มาก", photos:[
+        "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=1200&auto=format&fit=crop"
+      ] },
+      { id:"p_bangsaen", name:"หาดบางแสน", province:"ชลบุรี", category:"ธรรมชาติ", lat:13.2756, lng:100.9255, openingHours:"24 ชั่วโมง", tags:["ทะเล","ครอบครัว","ของกินเยอะ"], rating:4.1, crowd:"มาก", photos:[
+        "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop"
+      ] },
     ];
     let reviews = [
-      { id:"r1", placeId:"p_khaotao", user:"นนท์", userLevel:"Traveler", rating:5, text:"วิวเย็นสบาย ถ่ายรูปพระอาทิตย์ตกสวย แนะนำให้มาเร็ว มีที่จอดริมทาง", verifiedVisit:true, date:"2025-10-01", likes:22 },
-      { id:"r2", placeId:"p_somewhere_cnx", user:"แทมมี่", userLevel:"Explorer", rating:4, text:"กาแฟดี กลิ่นหอม บรรยากาศเขียวมาก เหมาะทำงานช่วงบ่าย", verifiedVisit:false, date:"2025-09-20", likes:18 },
-      { id:"r3", placeId:"p_monjam", user:"พีท", userLevel:"Local Expert", rating:5, text:"ลมเย็น วิวสวย แต่คนเยอะ ควรไปเช้า วันธรรมดา", verifiedVisit:true, date:"2025-09-12", likes:34 },
-      { id:"r4", placeId:"p_bangsaen", user:"ชิว", userLevel:"Traveler", rating:4, text:"ของกินเยอะ สนุกกับเพื่อน แต่แน่นวันหยุด", verifiedVisit:false, date:"2025-08-30", likes:10 },
+      { id:"r1", placeId:"p_khaotao", user:"นนท์", userLevel:"Traveler", rating:5, text:"วิวเย็นสบาย ถ่ายรูปพระอาทิตย์ตกสวย แนะนำให้มาเร็ว", verifiedVisit:true, date:"2025-10-01", likes:22, coverIndex:0, ratio:"4/5" },
+      { id:"r2", placeId:"p_somewhere_cnx", user:"แทมมี่", userLevel:"Explorer", rating:4, text:"กาแฟดี กลิ่นหอม บรรยากาศเขียวมาก เหมาะทำงานช่วงบ่าย", verifiedVisit:false, date:"2025-09-20", likes:18, coverIndex:1, ratio:"3/4" },
+      { id:"r3", placeId:"p_monjam", user:"พีท", userLevel:"Local Expert", rating:5, text:"ลมเย็น วิวสวย แต่คนเยอะ ไปเช้าดีสุด", verifiedVisit:true, date:"2025-09-12", likes:34, coverIndex:0, ratio:"4/5" },
+      { id:"r4", placeId:"p_bangsaen", user:"ชิว", userLevel:"Traveler", rating:4, text:"ของกินเยอะ สนุกกับเพื่อน แต่แน่นวันหยุด", verifiedVisit:false, date:"2025-08-30", likes:10, coverIndex:0, ratio:"1/1" },
     ];
+
+    // ของรางวัลทั่วไปเดิม
     const rewardsCatalog = [
       { id:"rw1", name:"ส่วนลด Grab 50 บาท", cost:300, desc:"ใช้ได้ทุกจังหวัด" },
       { id:"rw2", name:"คูปองเครื่องดื่มฟรี (Cafe Partner)", cost:500, desc:"ร้านที่ร่วมรายการ" },
       { id:"rw3", name:"กระเป๋าผ้า TripMate", cost:800, desc:"จัดส่งฟรี" },
     ];
+    // ของตกแต่งโปรไฟล์ (ใหม่) — ซื้อแล้วจะ “ครอบครอง” และนำไปใช้ในหน้าโปรไฟล์ได้
+    const cosmeticsCatalog = [
+      // ธีมพื้นหลัง
+      { id:"cs_theme_forest", type:"theme", name:"ธีมป่าเขียว", style:"theme-forest", cost:200, preview:"🌿 Forest" },
+      { id:"cs_theme_sunset", type:"theme", name:"ธีมพระอาทิตย์ตก", style:"theme-sunset", cost:200, preview:"🌇 Sunset" },
+      { id:"cs_theme_night",  type:"theme", name:"ธีมกลางคืน", style:"theme-night", cost:250, preview:"🌌 Night"  },
+      // กรอบอวาตาร์
+      { id:"cs_frame_gold", type:"frame", name:"กรอบทอง", style:"frame-gold", cost:180, preview:"🥇 Gold" },
+      { id:"cs_frame_neo",  type:"frame", name:"กรอบนีโอ", style:"frame-neo",  cost:150, preview:"🔷 Neo"  },
+      { id:"cs_frame_pastel", type:"frame", name:"กรอบพาสเทล", style:"frame-pastel", cost:150, preview:"💜 Pastel" },
+      // สติ๊กเกอร์
+      { id:"cs_stk_heart", type:"sticker", name:"สติ๊กเกอร์หัวใจ", style:"❤️", cost:80,  preview:"❤️" },
+      { id:"cs_stk_star",  type:"sticker", name:"สติ๊กเกอร์ดาว",   style:"⭐", cost:80,  preview:"⭐" },
+      { id:"cs_stk_cafe",  type:"sticker", name:"สติ๊กเกอร์แก้วกาแฟ", style:"☕", cost:80, preview:"☕" },
+      // แบดจ์
+      { id:"cs_badge_local", type:"badge", name:"Badge: Local Explorer", style:"Local Explorer", cost:120, preview:"🏷️ Local" },
+      { id:"cs_badge_mvp",   type:"badge", name:"Badge: MVP Reviewer",  style:"MVP Reviewer",   cost:200, preview:"🏆 MVP" },
+    ];
 
-    /* ---------- State & helpers ---------- */
-    let TAB="discover", MODE="posts", QUERY="", CAT="ทั้งหมด", PROV="ทั้งหมด", MAX_KM=80;
-    let user = JSON.parse(JSON.stringify(currentUser));
+    // -------- State --------
+    let TAB="discover", VIEW="vertical"; // vertical | tiles
+    let QUERY="", CAT="ทั้งหมด", PROV="ทั้งหมด", MAX_KM=80;
+    let user = { ...currentUser, points: currentUser.points, badges:[...currentUser.badges] };
     let userLoc = null;
 
     const $  = sel => document.querySelector(sel);
@@ -207,7 +274,6 @@
     const clip=(s,n)=>s.length>n?s.slice(0,n)+"…":s;
 
     const latestByPlace=()=>{const sorted=[...reviews].sort((a,b)=>a.date<b.date?1:-1);const m={};for(const r of sorted) if(!m[r.placeId]) m[r.placeId]=r;return m;}
-
     function filteredPlaces(){
       let arr=places.filter(p=>{
         const q=QUERY.trim().toLowerCase();
@@ -226,96 +292,32 @@
       return arr;
     }
 
-    /* ---------- UI Renders ---------- */
-    function renderNav(){
-      $$(".grid [data-tab]").forEach(btn=>{
-        btn.classList.toggle("text-blue-600",btn.dataset.tab===TAB);
-        btn.classList.toggle("text-gray-600",btn.dataset.tab!==TAB);
-      });
-      setHidden($("#page-discover"),TAB!=="discover");
-      setHidden($("#page-search"),TAB!=="search");
-      setHidden($("#page-groups"),TAB!=="groups");
-      setHidden($("#page-rewards"),TAB!=="rewards");
-      setHidden($("#page-profile"),TAB!=="profile");
-    }
-
-    function renderStories(){
-      // story = place photos/topics
-      const topics = [
-        {label:"#CafeWeek", photo:places[1].photos[0]},
-        {label:"#NatureNow", photo:places[2].photos[0]},
-        {label:"#ทะเล", photo:places[4].photos[0]},
-        {label:"#HiddenGems", photo:places[0].photos[0]},
-        {label:"#ครอบครัว", photo:places[3].photos[0]},
-      ];
-      $("#storiesRail").innerHTML = topics.map(t => `
-        <button class="flex flex-col items-center gap-1">
-          <span class="w-16 h-16 rounded-full ring-2 ring-blue-500 overflow-hidden">
-            <img src="${t.photo}" class="w-full h-full object-cover" />
-          </span>
-          <span class="text-[11px] text-gray-700">${t.label}</span>
-        </button>
-      `).join("");
-    }
-
-    function renderBanners(){
-      const banners=[
-        {id:"bn1",title:"คาเฟ่โทนอบอุ่น",subtitle:"ภาคเหนือกำลังฮิต",tag:"#CafeWeek",color:"from-rose-100 to-amber-50",emoji:"☕"},
-        {id:"bn2",title:"ธรรมชาติอากาศดี",subtitle:"รวมพิกัดถ่ายรูป",tag:"#NatureNow",color:"from-emerald-100 to-sky-100",emoji:"🌿"},
-        {id:"bn3",title:"#เมืองรองกำลังมา",subtitle:"ที่ใหม่คนยังไม่เยอะ",tag:"#HiddenGems",color:"from-indigo-100 to-fuchsia-100",emoji:"📍"},
-      ];
-      $("#promoBanners").innerHTML=banners.map(b=>`
-        <div class="min-w-[280px] rounded-2xl p-4 border bg-gradient-to-br ${b.color}">
-          <div class="flex items-start justify-between">
-            <div>
-              <div class="text-xs text-gray-600">แนะนำ</div>
-              <div class="font-semibold leading-tight">${b.title}</div>
-              <div class="text-[12px] text-gray-600">${b.subtitle}</div>
-            </div>
-            <div class="text-xl">${b.emoji}</div>
-          </div>
-          <div class="mt-2">
-            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs border bg-white/60">${b.tag}</span>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderTopTags(){
-      const tags=["#คาเฟ่วิวดี","#ธรรมชาติ","#ครอบครัว","#ถ่ายรูป","#เมืองรอง","#ทะเล","#ภูเขา","#workshop","#แฟน"];
-      $("#topTags").innerHTML=tags.map(t=>`
-        <button class="inline-flex items-center rounded-full px-3 py-1.5 text-xs border bg-white hover:bg-gray-50 whitespace-nowrap">${t}</button>
-      `).join("");
-    }
-
-    function socialCard(post){
-      // lifestyle social: big image, user row, action bar
+    // -------- Discover: Vertical Masonry Cards --------
+    function lemonCard(post){
+      // อัตราส่วนแนวตั้ง 4:5 / 3:4 / 1:1
+      const ratioMap = { "4/5":"pb-[125%]","3/4":"pb-[133%]","1/1":"pb-[100%]" };
+      const pb = ratioMap[post.ratio] || "pb-[125%]";
+      const p = places.find(x=>x.id===post.placeId);
+      const cover = p.photos[post.coverIndex || 0] || p.photos[0];
       return `
-        <article class="bg-white border rounded-2xl overflow-hidden">
-          <header class="px-4 pt-3 pb-2 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full overflow-hidden">
-              <img src="${post.place.photos[0]}" class="w-full h-full object-cover"/>
+        <article class="masonry-item bg-white border rounded-2xl overflow-hidden">
+          <div class="relative ${pb}">
+            <img src="${cover}" class="absolute inset-0 w-full h-full object-cover"/>
+            <div class="absolute left-2 top-2 inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-black/60 text-white">⭐ ${post.rating}</div>
+            ${post.verifiedVisit?`<div class="absolute right-2 top-2 inline-flex items-center px-2 py-0.5 text-[11px] rounded bg-white/90">✔︎ Verified</div>`:""}
+            <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white">
+              <div class="font-semibold">${p.name}</div>
+              <div class="text-xs opacity-90 line-2">${post.text}</div>
             </div>
+          </div>
+          <div class="px-3 py-2 flex items-center justify-between text-sm">
             <div class="min-w-0">
-              <div class="text-sm font-semibold truncate">${post.user} <span class="text-xs text-gray-500">· ${post.userLevel||""}</span></div>
-              <div class="text-[11px] text-gray-500 truncate">${post.place.name} · ${post.place.province}</div>
+              <div class="truncate">${post.user} <span class="text-xs text-gray-500">· ${post.userLevel||""}</span></div>
+              <div class="text-[11px] text-gray-500 truncate">${p.province} · ${p.category}</div>
             </div>
-            <div class="ml-auto text-amber-600 text-sm">⭐ ${post.rating}</div>
-          </header>
-          <figure class="relative">
-            <img src="${post.place.photos[0]}" class="w-full h-64 object-cover"/>
-            <figcaption class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white">
-              <div class="text-sm font-medium">${post.place.name}</div>
-              <p class="text-xs opacity-90 line-clamp-3">${post.text}</p>
-            </figcaption>
-          </figure>
-          <div class="px-4 py-2 flex items-center justify-between text-sm">
             <div class="flex items-center gap-3 text-gray-600">
-              <button class="flex items-center gap-1">❤️ <span>${post.likes}</span></button>
-              <button class="flex items-center gap-1" data-act="detail" data-id="${post.place.id}">📍 รายละเอียด</button>
-            </div>
-            <div class="flex items-center gap-2">
-              <button class="border rounded-full px-3 py-1.5 text-sm" data-act="share" data-text="รีวิว: ${post.place.name} โดย ${post.user}">แชร์</button>
+              <button class="flex items-center gap-1">❤️ ${post.likes}</button>
+              <button class="flex items-center gap-1" data-act="detail" data-id="${p.id}">📍 ดู</button>
             </div>
           </div>
         </article>
@@ -354,14 +356,42 @@
       `;
     }
 
+    function renderBanners(){
+      const banners=[
+        {id:"bn1",title:"โทนอุ่น Cozy Café",subtitle:"เชียงใหม่กำลังฮิต",tag:"#CafeWeek",color:"from-rose-100 to-amber-50",emoji:"☕"},
+        {id:"bn2",title:"ธรรมชาติอากาศดี",subtitle:"รวมพิกัดถ่ายรูป",tag:"#NatureNow",color:"from-emerald-100 to-sky-100",emoji:"🌿"},
+        {id:"bn3",title:"#เมืองรองกำลังมา",subtitle:"ที่ใหม่คนยังไม่เยอะ",tag:"#HiddenGems",color:"from-indigo-100 to-fuchsia-100",emoji:"📍"},
+      ];
+      $("#promoBanners").innerHTML=banners.map(b=>`
+        <div class="min-w-[280px] rounded-2xl p-4 border bg-gradient-to-br ${b.color}">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-xs text-gray-600">แนะนำ</div>
+              <div class="font-semibold leading-tight">${b.title}</div>
+              <div class="text-[12px] text-gray-600">${b.subtitle}</div>
+            </div>
+            <div class="text-xl">${b.emoji}</div>
+          </div>
+          <div class="mt-2">
+            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs border bg-white/60">${b.tag}</span>
+          </div>
+        </div>
+      `).join("");
+      $("#topTags").innerHTML=["#คาเฟ่วิวดี","#ธรรมชาติ","#ครอบครัว","#ถ่ายรูป","#เมืองรอง","#ทะเล","#ภูเขา"]
+        .map(t=>`<button class="inline-flex items-center rounded-full px-3 py-1.5 text-xs border bg-white hover:bg-gray-50 whitespace-nowrap">${t}</button>`).join("");
+    }
+
     function renderDiscover(){
-      const container=$("#discoverContent");
-      if(MODE==="posts"){
-        const posts=[...reviews].map(r=>({...r,place:places.find(p=>p.id===r.placeId)})).sort((a,b)=>a.date<b.date?1:-1);
-        container.innerHTML=posts.map(socialCard).join("");
-      } else {
+      const posts=[...reviews].map(r=>({ ...r, place: places.find(p=>p.id===r.placeId)})).sort((a,b)=>a.date<b.date?1:-1);
+      if(VIEW==="vertical"){
+        $("#discoverTiles").classList.add("hidden");
+        $("#discoverMasonry").classList.remove("hidden");
+        $("#discoverMasonry").innerHTML=posts.map(lemonCard).join("");
+      }else{
+        $("#discoverMasonry").classList.add("hidden");
+        $("#discoverTiles").classList.remove("hidden");
         const map=latestByPlace(); const arr=filteredPlaces();
-        container.innerHTML=arr.map(p=>{
+        $("#discoverTiles").innerHTML=arr.map(p=>{
           const r=map[p.id];
           const dist=userLoc?fmtKm(kmDist(userLoc.lat,userLoc.lng,p.lat,p.lng)):null;
           return tileCard(p,r,dist);
@@ -369,6 +399,7 @@
       }
     }
 
+    // -------- Search --------
     function renderSearchChips(){
       const cats=["ทั้งหมด","คาเฟ่","ธรรมชาติ","ที่พัก","ร้านอาหาร","แลนด์มาร์ก"];
       $("#categoryChips").innerHTML=cats.map(c=>`
@@ -389,29 +420,29 @@
       }).join(""):`<p class="text-sm text-gray-500">ไม่พบผลลัพธ์ตามตัวกรอง</p>`;
     }
 
+    // -------- Groups (เหมือนเดิม ย่อให้อ่านง่าย) --------
     function renderGroups(){
-      const container=$("#groupContainer");
-      const existing=container.getAttribute("data-group")==="1";
-      if(!existing){
-        container.innerHTML=`
-          <div class="bg-white border rounded-2xl p-4">
-            <div class="flex items-center justify-between mb-2">
-              <div class="text-lg font-semibold">สร้างกลุ่มไปเที่ยว</div>
-              <button id="createGroupBtn" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-3 py-1.5">+ สร้างกลุ่มใหม่</button>
-            </div>
-            <p class="text-sm text-gray-600">เพิ่มเพื่อน เสนอที่เที่ยว แล้วโหวตเลือก จากนั้นกด "สรุปทริป" เพื่อสร้างแผนแบบคลิกเดียว</p>
-          </div>
-          <div id="groupArea" class="mt-3"></div>
-        `;
-        container.setAttribute("data-group","1");
-        $("#createGroupBtn").onclick=()=>{
-          const g={id:"g_"+Date.now(), name:"ทริปเชียงใหม่ปีใหม่ 2025", members:["แทมมี่","นนท์","พีท","ชิว"], date:"2025-12-30", province:"เชียงใหม่", proposals:["p_monjam","p_somewhere_cnx","p_doisuthep"], votes:{}, confirmedPlaceIds:null};
-          container.dataset.gdata=JSON.stringify(g);
-          drawGroup(g);
-        };
-      } else if(container.dataset.gdata){
-        drawGroup(JSON.parse(container.dataset.gdata));
+      const c=$("#groupContainer");
+      if(c.getAttribute("data-group")==="1"){
+        drawGroup(JSON.parse(c.dataset.gdata));
+        return;
       }
+      c.innerHTML=`
+        <div class="bg-white border rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-lg font-semibold">สร้างกลุ่มไปเที่ยว</div>
+            <button id="createGroupBtn" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-3 py-1.5">+ สร้างกลุ่มใหม่</button>
+          </div>
+          <p class="text-sm text-gray-600">เพิ่มเพื่อน เสนอที่เที่ยว โหวต แล้วกด "สรุปทริป" เพื่อสร้างแผนแบบคลิกเดียว</p>
+        </div>
+        <div id="groupArea" class="mt-3"></div>
+      `;
+      c.setAttribute("data-group","1");
+      $("#createGroupBtn").onclick=()=>{
+        const g={id:"g_"+Date.now(), name:"ทริปเชียงใหม่ปีใหม่ 2025", members:["แทมมี่","นนท์","พีท","ชิว"], date:"2025-12-30", province:"เชียงใหม่", proposals:["p_monjam","p_somewhere_cnx","p_doisuthep"], votes:{}, confirmedPlaceIds:null};
+        c.dataset.gdata=JSON.stringify(g);
+        drawGroup(g);
+      };
     }
 
     function drawGroup(g){
@@ -451,11 +482,7 @@
         <div id="tripSummary"></div>
       `;
       area.querySelectorAll("[data-vote]").forEach(btn=>{
-        btn.addEventListener("click",()=>{
-          g.votes[currentUser.name]=btn.getAttribute("data-vote");
-          document.querySelector("#groupContainer").dataset.gdata=JSON.stringify(g);
-          drawGroup(g);
-        });
+        btn.addEventListener("click",()=>{ g.votes[currentUser.name]=btn.getAttribute("data-vote"); document.querySelector("#groupContainer").dataset.gdata=JSON.stringify(g); drawGroup(g); });
       });
       $("#confirmTripBtn").onclick=()=>{
         const counts={}; g.proposals.forEach(pid=>counts[pid]=0);
@@ -467,7 +494,6 @@
         alert("สรุปทริปแล้ว: รวมข้อมูลแบบคลิกเดียว");
       };
     }
-
     function drawTripSummary(ids){
       const cont=$("#tripSummary");
       const map=latestByPlace();
@@ -498,9 +524,11 @@
       `;
     }
 
+    // -------- Rewards & Cosmetics --------
     function renderRewards(){
       $("#pointsEl").textContent=user.points+" pts";
       $("#badgesEl").textContent="แบดจ์: "+(user.badges.join(", ")||"-");
+
       $("#rewardsList").innerHTML=rewardsCatalog.map(rw=>`
         <div class="bg-white border rounded-2xl p-4 flex items-center justify-between">
           <div>
@@ -513,16 +541,92 @@
           </div>
         </div>
       `).join("");
+
+      $("#cosmeticsList").innerHTML=cosmeticsCatalog.map(c=>`
+        <div class="bg-white border rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <div class="font-semibold">${c.name}</div>
+            <div class="text-sm text-gray-500">ประเภท: ${c.type}</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm">${c.preview}</span>
+            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs bg-gray-100">${c.cost} pts</span>
+            <button class="border rounded-full px-3 py-1.5 text-sm" data-buy="${c.id}">ซื้อ</button>
+          </div>
+        </div>
+      `).join("");
+
+      // การแลก/ซื้อ
       $("#rewardsList").querySelectorAll("[data-redeem]").forEach(btn=>{
         btn.addEventListener("click",()=>{
           const rw=rewardsCatalog.find(r=>r.id===btn.getAttribute("data-redeem"));
-          if(user.points<rw.cost){alert("แต้มไม่พอแลก");return;}
+          if(user.points<rw.cost){ alert("แต้มไม่พอแลก");return; }
           user.points-=rw.cost; renderRewards(); renderProfileHeader();
           alert(`แลก "${rw.name}" สำเร็จ (mock)`);
         });
       });
+      $("#cosmeticsList").querySelectorAll("[data-buy]").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          const cs=cosmeticsCatalog.find(x=>x.id===btn.getAttribute("data-buy"));
+          if(user.points<cs.cost){ alert("แต้มไม่พอซื้อของตกแต่ง");return; }
+          user.points-=cs.cost;
+          // เก็บของตกแต่งไว้ใน local owned
+          const owned = JSON.parse(localStorage.getItem("ownedCosmetics")||"[]");
+          if(!owned.includes(cs.id)) owned.push(cs.id);
+          localStorage.setItem("ownedCosmetics", JSON.stringify(owned));
+          renderRewards(); renderOwnedCosmetics();
+          alert(`ซื้อ ${cs.name} สำเร็จ! ไปที่หน้าโปรไฟล์เพื่อใช้งาน`);
+        });
+      });
     }
 
+    function renderOwnedCosmetics(){
+      const owned = JSON.parse(localStorage.getItem("ownedCosmetics")||"[]");
+      $("#ownedCosmetics").innerHTML = owned.length? owned.map(id=>{
+        const cs = cosmeticsCatalog.find(x=>x.id===id);
+        return `
+          <div class="border rounded-xl p-3 flex items-center justify-between">
+            <div class="min-w-0">
+              <div class="font-medium truncate">${cs.name}</div>
+              <div class="text-xs text-gray-500 truncate">ประเภท: ${cs.type}</div>
+            </div>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-3 py-1.5 text-sm" data-apply="${cs.id}">ใช้งาน</button>
+          </div>
+        `;
+      }).join("") : `<p class="text-sm text-gray-500">ยังไม่มีของตกแต่งที่ครอบครอง</p>`;
+
+      $("#ownedCosmetics").querySelectorAll("[data-apply]").forEach(btn=>{
+        btn.addEventListener("click",()=>applyCosmetic(btn.getAttribute("data-apply")));
+      });
+    }
+
+    // ใช้ของตกแต่งกับโปรไฟล์
+    function applyCosmetic(id){
+      const cs = cosmeticsCatalog.find(x=>x.id===id);
+      if(!cs) return;
+      if(cs.type==="theme"){
+        const el = $("#profileTheme");
+        el.classList.remove("theme-basic","theme-forest","theme-sunset","theme-night");
+        el.classList.add(cs.style);
+      } else if(cs.type==="frame"){
+        const wrap=$("#avatarWrap");
+        wrap.className = "w-16 h-16 overflow-hidden grid place-items-center " + cs.style;
+        wrap.style.background="#fff";
+      } else if(cs.type==="sticker"){
+        const holder = $("#profileStickers");
+        const span = document.createElement("span");
+        span.className="sticker text-4xl left-6 -top-8";
+        span.textContent = cs.style;
+        holder.appendChild(span);
+        holder.style.height="24px";
+      } else if(cs.type==="badge"){
+        if(!user.badges.includes(cs.style)) user.badges.push(cs.style);
+        renderProfileHeader();
+      }
+      alert("ใช้งานของตกแต่งแล้ว");
+    }
+
+    // -------- Profile --------
     function renderProfileHeader(){
       $("#userNameEl").textContent=user.name;
       $("#userHandleEl").textContent=user.handle;
@@ -543,6 +647,7 @@
       }).join(""):`<p class="text-sm text-gray-500">ยังไม่มีรีวิว</p>`;
     }
 
+    // -------- Detail --------
     function renderDetail(place){
       const placeReviews=reviews.filter(r=>r.placeId===place.id).sort((a,b)=>a.date<b.date?1:-1);
       const autoNearby=places.filter(p=>p.id!==place.id).map(p=>({p,d:kmDist(place.lat,place.lng,p.lat,p.lng)}))
@@ -595,72 +700,54 @@
       `;
     }
 
-    function openDetail(place){ renderDetail(place); setHidden($("#detailModal"), false); }
-    function closeDetail(){ setHidden($("#detailModal"), true); }
+    // -------- Events & Init --------
+    const openDetail = (place)=>{ renderDetail(place); setHidden($("#detailModal"), false); };
+    const closeDetail = ()=> setHidden($("#detailModal"), true);
+    $("#closeDetail").onclick=closeDetail;
 
-    function openCreate(){ populateCreatePlaces(); updateVerifyHint(); setHidden($("#createModal"), false); }
-    function closeCreate(){ setHidden($("#createModal"), true); }
-
-    function populateCreatePlaces(){ $("#createPlace").innerHTML=places.map(p=>`<option value="${p.id}">${p.name} · ${p.province}</option>`).join(""); }
-    function updateVerifyHint(){
-      const pid=$("#createPlace").value||places[0].id;
-      const p=places.find(x=>x.id===pid);
-      const verified=userLoc?kmDist(userLoc.lat,userLoc.lng,p.lat,p.lng)<=1:false;
-      $("#verifyHint").innerHTML=verified?
-        `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs bg-gray-100">✔︎ Verified Visitor (GPS)</span>`:
-        `* เปิดตำแหน่งใกล้สถานที่เพื่อรับสถานะ Verified`;
-    }
-
-    /* ---------- Events ---------- */
+    // Bottom nav
     $$(".grid [data-tab]").forEach(btn=>{
-      btn.onclick=()=>{
-        TAB=btn.dataset.tab; renderNav();
-        if(TAB==="discover"){renderDiscover()}
-        if(TAB==="search"){renderSearchResults()}
-        if(TAB==="groups"){renderGroups()}
-        if(TAB==="rewards"){renderRewards()}
-        if(TAB==="profile"){renderProfileHeader()}
+      btn.onclick=()=>{ TAB=btn.dataset.tab;
+        ["discover","search","groups","rewards","profile"].forEach(id=>setHidden($("#page-"+id), id!==TAB));
+        btn.parentElement.querySelectorAll("button").forEach(b=>{
+          b.classList.toggle("text-blue-600", b===btn);
+          b.classList.toggle("text-gray-600", b!==btn);
+        });
+        if(TAB==="discover") renderDiscover();
+        if(TAB==="search")   { renderSearchChips(); renderSearchResults(); }
+        if(TAB==="groups")   renderGroups();
+        if(TAB==="rewards")  renderRewards();
+        if(TAB==="profile")  { renderProfileHeader(); renderOwnedCosmetics(); }
       };
     });
 
-    $("#modePostsBtn").onclick=()=>{ MODE="posts";
-      $("#modePostsBtn").className="bg-blue-600 text-white rounded-full px-3 py-1.5 text-sm";
-      $("#modeTilesBtn").className="border rounded-full px-3 py-1.5 text-sm";
-      renderDiscover();
-    };
-    $("#modeTilesBtn").onclick=()=>{ MODE="tiles";
-      $("#modeTilesBtn").className="bg-blue-600 text-white rounded-full px-3 py-1.5 text-sm";
-      $("#modePostsBtn").className="border rounded-full px-3 py-1.5 text-sm";
+    // toggle view
+    $("#toggleView").onclick=()=>{
+      VIEW = VIEW==="vertical" ? "tiles" : "vertical";
+      $("#toggleView").textContent = "โหมด: " + (VIEW==="vertical"?"ภาพแนวตั้ง":"สรุปสถานที่");
       renderDiscover();
     };
 
+    // share / detail (delegate)
     document.body.addEventListener("click",(e)=>{
       const t=e.target.closest("[data-act]");
       if(!t) return;
       const act=t.getAttribute("data-act");
       if(act==="detail"){
         const id=t.getAttribute("data-id");
-        const p=places.find(x=>x.id===id);
-        openDetail(p);
+        openDetail(places.find(x=>x.id===id));
       } else if(act==="share"){
         const text=t.getAttribute("data-text")||"TripMate";
-        if(navigator.share){ navigator.share({title:"TripMate", text}); }
-        else { navigator.clipboard.writeText(text); alert("คัดลอกแล้ว"); }
+        if(navigator.share) navigator.share({title:"TripMate", text}); else { navigator.clipboard.writeText(text); alert("คัดลอกแล้ว"); }
       }
     });
 
-    $("#closeDetail").onclick=closeDetail;
-
-    $("#applySearchBtn").onclick=()=>{ QUERY=$("#searchInput").value||""; renderSearchResults(); };
-    $("#searchInput").addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ QUERY=$("#searchInput").value||""; renderSearchResults(); }});
-    $("#topSearch").addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ TAB="search"; renderNav(); $("#searchInput").value=e.target.value; QUERY=e.target.value; renderSearchResults(); }});
-
-    $("#distSlider").addEventListener("input",(e)=>{ MAX_KM=Number(e.target.value); $("#distVal").textContent=MAX_KM; renderSearchResults(); });
-    $("#categoryChips").addEventListener("click",(e)=>{ const b=e.target.closest("[data-cat]"); if(!b) return; CAT=b.getAttribute("data-cat"); renderSearchChips(); renderSearchResults(); });
-    $("#provinceChips").addEventListener("click",(e)=>{ const b=e.target.closest("[data-prov]"); if(!b) return; PROV=b.getAttribute("data-prov"); renderSearchChips(); renderSearchResults(); });
-
-    $("#openCreatePost").onclick=openCreate;
-    $("#fabCreate").onclick=openCreate;
+    // Create post modal
+    const setHiddenEl=(id,val)=> setHidden($(id), val);
+    $("#openCreatePost").onclick=()=>{ openCreate(); };
+    $("#fabCreate").onclick=()=>{ openCreate(); };
+    function openCreate(){ populateCreatePlaces(); updateVerifyHint(); setHiddenEl("#createModal", false); }
+    function closeCreate(){ setHiddenEl("#createModal", true); }
     $("#closeCreate").onclick=closeCreate;
     $("#cancelCreate").onclick=closeCreate;
     $("#createPlace").addEventListener("change", updateVerifyHint);
@@ -671,28 +758,45 @@
       const text=$("#createText").value||"ประสบการณ์ดีมาก แนะนำครับ/ค่ะ";
       const p=places.find(x=>x.id===placeId);
       const verified=userLoc?kmDist(userLoc.lat,userLoc.lng,p.lat,p.lng)<=1:false;
-      const newReview={id:"r_"+Date.now(), placeId, user:user.name, userLevel:user.level, rating, text, verifiedVisit:verified, date:new Date().toISOString().slice(0,10), likes:0};
+      const newReview={id:"r_"+Date.now(), placeId, user:user.name, userLevel:user.level, rating, text, verifiedVisit:verified, date:new Date().toISOString().slice(0,10), likes:0, coverIndex:0, ratio:"4/5"};
       reviews=[newReview,...reviews];
       user.points+=10+(verified?5:0);
       if(verified && !user.badges.includes("Verified Explorer")) user.badges.push("Verified Explorer");
       alert(`โพสต์รีวิวสำเร็จ! ได้แต้ม ${10+(verified?5:0)}`);
       renderDiscover(); renderRewards(); renderProfileHeader(); closeCreate();
     };
-
-    function init(){
-      renderNav(); renderStories(); renderBanners(); renderTopTags();
-      renderDiscover(); renderSearchChips(); renderSearchResults(); renderGroups(); renderRewards(); renderProfileHeader();
-      if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition((pos)=>{
-          userLoc={lat:pos.coords.latitude,lng:pos.coords.longitude};
-          $("#locInfo").textContent="ใช้งานตำแหน่งใกล้คุณ";
-          renderDiscover(); renderSearchResults(); updateVerifyHint();
-        }, ()=>{
-          $("#locInfo").textContent="ไม่สามารถใช้ตำแหน่งได้ จะแสดงผลตามคะแนนนิยมแทน";
-        }, {enableHighAccuracy:true, timeout:7000});
-      } else { $("#locInfo").textContent="โหมดไม่มีตำแหน่ง"; }
+    function populateCreatePlaces(){ $("#createPlace").innerHTML=places.map(p=>`<option value="${p.id}">${p.name} · ${p.province}</option>`).join(""); }
+    function updateVerifyHint(){
+      const pid=$("#createPlace").value||places[0].id;
+      const p=places.find(x=>x.id===pid);
+      const verified=userLoc?kmDist(userLoc.lat,userLoc.lng,p.lat,p.lng)<=1:false;
+      $("#verifyHint").innerHTML=verified?
+        `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs bg-gray-100">✔︎ Verified Visitor (GPS)</span>`:
+        `* เปิดตำแหน่งใกล้สถานที่เพื่อรับสถานะ Verified`;
     }
-    init();
+
+    // top search → ไปหน้า search
+    $("#topSearch").addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ TAB="search"; ["discover","search","groups","rewards","profile"].forEach(id=>setHidden($("#page-"+id), id!==TAB)); $("#searchInput").value=e.target.value; QUERY=e.target.value; renderSearchChips(); renderSearchResults(); }});
+    $("#applySearchBtn").onclick=()=>{ QUERY=$("#searchInput").value||""; renderSearchResults(); };
+    $("#distSlider").addEventListener("input",(e)=>{ MAX_KM=Number(e.target.value); $("#distVal").textContent=MAX_KM; renderSearchResults(); });
+    $("#categoryChips").addEventListener("click",(e)=>{ const b=e.target.closest("[data-cat]"); if(!b) return; CAT=b.getAttribute("data-cat"); renderSearchChips(); renderSearchResults(); });
+    $("#provinceChips").addEventListener("click",(e)=>{ const b=e.target.closest("[data-prov]"); if(!b) return; PROV=b.getAttribute("data-prov"); renderSearchChips(); renderSearchResults(); });
+
+    // geolocation
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition((pos)=>{
+        userLoc={lat:pos.coords.latitude,lng:pos.coords.longitude};
+        $("#locInfo").textContent="ใช้งานตำแหน่งใกล้คุณ";
+        renderDiscover(); renderSearchResults(); updateVerifyHint();
+      }, ()=>{
+        $("#locInfo").textContent="ไม่สามารถใช้ตำแหน่งได้ จะแสดงผลตามคะแนนนิยมแทน";
+      }, {enableHighAccuracy:true, timeout:7000});
+    } else {
+      $("#locInfo").textContent="โหมดไม่มีตำแหน่ง";
+    }
+
+    // init
+    renderBanners(); renderDiscover(); renderSearchChips(); renderSearchResults(); renderGroups(); renderRewards(); renderProfileHeader(); renderOwnedCosmetics();
   </script>
 </body>
 </html>
