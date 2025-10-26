@@ -7,19 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
 model User {
-  id            String     @id @default(cuid())
+  id            String           @id @default(cuid())
+  handle        String           @unique
   name          String?
-  email         String?    @unique
+  email         String?          @unique
   emailVerified DateTime?
   image         String?
+  bio           String?
+  role          Role             @default(USER)
+  ornaments     OrnamentOnUser[]
+  posts         Post[]
+  savedPosts    Save[]
+  likes         Like[]
+  comments      Comment[]
+  feedback      Feedback[]
   accounts      Account[]
   sessions      Session[]
-  posts         Post[]
-  places        Place[]    @relation("PlaceCreator")
-  feedback      Feedback[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 }
 
 model Account {
@@ -59,36 +76,131 @@ model VerificationToken {
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  imageUrl  String?
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String      @id @default(cuid())
+  authorId    String
+  placeId     String?
+  title       String?
+  content     String?
+  imageUrls   String[]
+  visibility  Visibility  @default(PUBLIC)
+  likes       Like[]
+  comments    Comment[]
+  saves       Save[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
+  author      User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  place       Place?      @relation(fields: [placeId], references: [id], onDelete: SetNull)
+
+  @@index([authorId])
+  @@index([placeId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([userId])
+}
+
+model Save {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([userId])
+}
+
+model Ornament {
+  id        String           @id @default(cuid())
+  code      String           @unique
+  name      String
+  icon      String
+  rarity    String
+  obtainedBy OrnamentOnUser[]
+
+  @@index([rarity])
+}
+
+model OrnamentOnUser {
+  id          String    @id @default(cuid())
+  userId      String
+  ornamentId  String
+  obtainedAt  DateTime  @default(now())
+  equipped    Boolean   @default(false)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ornament  Ornament  @relation(fields: [ornamentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ornamentId])
+  @@index([userId])
 }
 
 model Place {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
+  slug        String        @unique
   description String?
-  location    String
-  imageUrl    String?
-  creatorId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  category    String
+  tags        String[]
+  lat         Float
+  lng         Float
+  address     String?
+  coverUrl    String?
+  ratingAvg   Float         @default(0)
+  ratingCount Int           @default(0)
+  posts       Post[]
+  weather     WeatherCache[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  creator User @relation("PlaceCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  @@index([category])
+  @@index([ratingAvg])
+}
+
+model WeatherCache {
+  id        String   @id @default(cuid())
+  placeId   String
+  payload   Json
+  fetchedAt DateTime @default(now())
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([placeId])
+  @@index([placeId])
 }
 
 model Feedback {
   id        String   @id @default(cuid())
+  userId    String?
+  email     String?
   message   String
   rating    Int?
-  email     String?
-  userId    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
