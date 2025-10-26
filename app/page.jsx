@@ -3,7 +3,7 @@ import path from "node:path";
 
 const LEGACY_INDEX_PATH = path.join(process.cwd(), "public", "index.html");
 
-const extractBodyMarkup = (): string => {
+const extractBodyMarkup = () => {
   try {
     const html = readFileSync(LEGACY_INDEX_PATH, "utf8");
     const match = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);

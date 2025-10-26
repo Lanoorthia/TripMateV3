@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "TripMate — Social Travel Feed",
   description: "TripMate social travel lifestyle feed for discovering Pathum Thani adventures.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }) {
   return (
     <html lang="th" data-theme="light">
       <head>
