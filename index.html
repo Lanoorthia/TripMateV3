@@ -8,30 +8,29 @@
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root{
-      --bg:#ffffff; --text:#0b0b0b; --card:#f7f7f8; --muted:#6b7280; --chip:#e5e7eb; --primary:#2563eb;
-    }
-    [data-theme="dark"]{
-      --bg:#0b0b0b; --text:#f2f2f2; --card:#151515; --muted:#a1a1aa; --chip:#1f2937; --primary:#60a5fa;
-    }
-    html,body{background:var(--bg);color:var(--text);}
-    .card{background:var(--card); border:1px solid var(--chip); border-radius:18px; overflow:hidden}
-    .chip{background:var(--chip); color:var(--text); padding:.35rem .6rem; border-radius:999px; font-size:.9rem; display:inline-flex; align-items:center; gap:.25rem}
-    .chip[aria-pressed="true"]{outline:2px solid var(--primary)}
-    .nav a{padding:.35rem .6rem;border-radius:10px}
-    .nav a:hover{background:var(--chip)}
-    .avatar{width:36px;height:36px;border-radius:50%;object-fit:cover}
-    .pf-frame-basic{outline:2px solid var(--chip); outline-offset:2px}
-    .pf-frame-pastel{box-shadow:0 0 0 3px #ffd3e2 inset}
-    .pf-frame-neon{box-shadow:0 0 0 2px #22d3ee, 0 0 18px #22d3ee}
-    .pf-frame-gold{box-shadow:0 0 0 3px #d4af37 inset}
-    .pf-frame-leafy{box-shadow:0 0 0 3px #86efac inset}
-    .media{aspect-ratio:4/5;width:100%;object-fit:cover;display:block}
-    .grid3{display:grid;gap:16px;grid-template-columns:repeat(1,minmax(0,1fr))}
-    @media(min-width:700px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(min-width:1024px){.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}}
-    .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{scrollbar-width:none}
-    .focus-ring:focus-visible{outline:2px solid var(--primary); outline-offset:2px}
+   /* === Legacy look from original index.html === */
+.card-legacy { background:#fff; border:1px solid #e5e7eb; border-radius:16px; overflow:hidden; }
+.input-legacy { background:#fff; border:1px solid #e5e7eb; border-radius:999px; padding:.6rem .9rem; }
+.select-legacy { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:.5rem .75rem; }
+.btn-primary-legacy { background:#2563eb; color:#fff; border:none; border-radius:999px; padding:.55rem 1rem; }
+.btn-ghost-legacy { background:#fff; border:1px solid #e5e7eb; border-radius:999px; padding:.55rem 1rem; }
+
+/* โปรไฟล์: แบนเนอร์ธีม (เหมือนไฟล์เดิม) */
+.theme-basic{ background-image:linear-gradient(140deg,#eef2ff 0%,#fdf2f8 100%);}
+.theme-forest{ background-image:linear-gradient(140deg,#e8f5e9 0%,#e0f2f1 100%);}
+.theme-sunset{ background-image:linear-gradient(140deg,#fff1f2 0%,#fef3c7 100%);}
+.theme-night { background-image:linear-gradient(140deg,#0f172a 0%,#1f2937 100%); color:#e5e7eb; }
+
+/* โปรไฟล์: กรอบอวาตาร์ (ชื่อคลาสให้ตรงของเดิม) */
+.frame-none{}
+.frame-gold{ box-shadow:0 0 0 3px #f59e0b inset,0 0 0 5px #fff; border-radius:999px; }
+.frame-neo{ box-shadow:0 0 0 3px #06b6d4 inset,0 0 0 5px #fff; border-radius:18px; }
+.frame-pastel{ box-shadow:0 0 0 3px #a78bfa inset,0 0 0 5px #fff; border-radius:999px; }
+
+/* Chip แท็กแบบเดิม */
+.chip-legacy{ background:#f3f4f6; color:#111827; padding:.35rem .6rem; border-radius:999px; font-size:.9rem; }
+.chip-legacy[aria-pressed="true"]{ outline:2px solid #2563eb; }
+
   </style>
 </head>
 <body data-theme="light" class="min-h-screen">
@@ -73,67 +72,104 @@
 
     <!-- COMPOSE -->
     <section id="view-compose" class="hidden space-y-3">
-      <h1 class="text-xl font-semibold" data-i18n="compose.title">Compose</h1>
-      <div class="max-w-xl space-y-2">
-        <label class="text-sm" data-i18n="compose.caption">Caption</label>
-        <textarea id="composeCaption" rows="5" class="w-full border rounded-xl p-3 focus-ring" placeholder="พิมพ์ #แท็ก ลงในข้อความได้"></textarea>
-        <div id="suggestBar" class="flex flex-wrap gap-2"></div>
-        <label class="text-sm" data-i18n="compose.media">Media (image or video)</label>
-        <input id="composeFile" type="file" accept="image/*,video/mp4,video/webm" class="focus-ring" />
-        <div id="composePreview" class="mt-2"></div>
-        <button id="postBtn" class="px-4 py-2 rounded-xl text-white" style="background:var(--primary)" data-i18n="compose.post">Post</button>
-      </div>
-    </section>
+  <h1 class="text-xl font-semibold" data-i18n="compose.title">สร้างโพสต์</h1>
+
+  <div class="card-legacy p-4 max-w-xl">
+    <label class="text-sm" data-i18n="compose.caption">คำบรรยาย</label>
+    <textarea id="composeCaption" rows="5" class="w-full mt-1 border rounded-xl p-3" placeholder="พิมพ์ #แท็ก ลงในข้อความได้"></textarea>
+
+    <div id="suggestBar" class="flex flex-wrap gap-2 mt-2"></div>
+
+    <label class="text-sm block mt-3" data-i18n="compose.media">สื่อ (ภาพ/วิดีโอ)</label>
+    <input id="composeFile" type="file" accept="image/*,video/mp4,video/webm" class="mt-1" />
+    <div id="composePreview" class="mt-2"></div>
+
+    <div class="mt-3 flex gap-2">
+      <button id="postBtn" class="btn-primary-legacy" data-i18n="compose.post">โพสต์</button>
+      <button class="btn-ghost-legacy" onclick="history.back()">ยกเลิก</button>
+    </div>
+  </div>
+</section>
 
     <!-- PLACES -->
     <section id="view-places" class="hidden space-y-3">
-      <h1 class="text-xl font-semibold" data-i18n="places.title">Places</h1>
-      <div class="flex flex-col sm:flex-row gap-2">
-        <input id="placeQuery" class="chip flex-1 focus-ring" placeholder="ค้นหาชื่อหรือ #แท็ก">
-        <select id="placeProvince" class="chip focus-ring"></select>
-      </div>
-      <div id="placeTags" class="flex flex-wrap gap-2 pt-1"></div>
-      <div class="text-sm text-[var(--muted)]" id="placeResultCount"></div>
-      <div class="grid3" id="placesGrid"></div>
-      <aside class="space-y-2">
-        <div class="text-sm font-semibold" data-i18n="tag.trending"># กำลังมาแรง</div>
-        <div id="trendingBarPlaces" class="flex flex-wrap gap-2"></div>
-      </aside>
-    </section>
+  <h1 class="text-xl font-semibold" data-i18n="places.title">สถานที่</h1>
+
+  <div class="card-legacy p-3 flex flex-col sm:flex-row gap-2 items-center">
+    <div class="flex-1 w-full">
+      <input id="placeQuery" class="input-legacy w-full" placeholder="ค้นหาชื่อหรือ #แท็ก">
+    </div>
+    <select id="placeProvince" class="select-legacy"></select>
+  </div>
+
+  <div class="card-legacy p-3">
+    <div id="placeTags" class="flex flex-wrap gap-2"></div>
+  </div>
+
+  <div class="text-sm text-gray-500" id="placeResultCount"></div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="placesGrid"></div>
+
+  <aside class="space-y-2">
+    <div class="text-sm font-semibold" data-i18n="tag.trending"># กำลังมาแรง</div>
+    <div id="trendingBarPlaces" class="flex flex-wrap gap-2"></div>
+  </aside>
+</section>
+
 
     <!-- PROFILE -->
-    <section id="view-profile" class="hidden space-y-3">
-      <h1 class="text-xl font-semibold" data-i18n="profile.title">Profile</h1>
-      <div class="card p-4 flex items-center gap-3">
-        <img id="meAvatar" class="avatar pf-frame-basic" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop" alt="">
+    <section id="view-profile" class="hidden space-y-4">
+  <h1 class="text-xl font-semibold" data-i18n="profile.title">โปรไฟล์</h1>
+
+  <!-- การ์ดโปรไฟล์สไตล์เดิม -->
+  <div class="card-legacy">
+    <div id="profileTheme" class="h-24 theme-basic"></div>
+    <div class="p-4 pt-0">
+      <div class="relative -mt-8 flex items-center gap-3">
+        <div id="avatarWrap" class="w-16 h-16 rounded-full bg-white grid place-items-center overflow-hidden frame-none">
+          <img id="avatarImg" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop" alt="">
+        </div>
         <div>
-          <div class="font-semibold" id="meName">Tammy</div>
-          <div class="text-sm text-[var(--muted)]" id="meBadges">Explorer</div>
+          <div id="meName" class="font-semibold">Tammy</div>
+          <div id="meBadges" class="text-sm text-gray-500">Explorer</div>
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+          <button id="themeBasic" class="btn-ghost-legacy">Basic</button>
+          <button id="themeForest" class="btn-ghost-legacy">Forest</button>
+          <button id="themeSunset" class="btn-ghost-legacy">Sunset</button>
+          <button id="themeNight" class="btn-ghost-legacy">Night</button>
         </div>
       </div>
-      <div>
-        <div class="text-sm font-semibold" data-i18n="profile.frames">Profile frame</div>
-        <div id="framePicker" class="flex flex-wrap gap-2 pt-1"></div>
-      </div>
-    </section>
+    </div>
+  </div>
+
+  <!-- เลือกกรอบโปรไฟล์ -->
+  <div class="card-legacy p-4">
+    <div class="text-sm font-semibold" data-i18n="profile.frames">ของตกแต่งโปรไฟล์</div>
+    <div id="framePicker" class="flex flex-wrap gap-2 pt-2"></div>
+  </div>
+</section>
 
     <!-- TAGS -->
-    <section id="view-tags" class="hidden space-y-3">
-      <div class="flex items-center justify-between">
-        <h1 class="text-xl font-semibold" id="tagTitle">#tag</h1>
-        <button id="followBtn" class="chip">ติดตามแท็ก</button>
-      </div>
-      <div class="flex gap-2">
-        <button class="chip" aria-pressed="true" data-tab="posts">Posts</button>
-        <button class="chip" aria-pressed="false" data-tab="places">Places</button>
-      </div>
-      <div id="tagResults" class="grid3"></div>
-      <div>
-        <div class="text-sm font-semibold" data-i18n="tag.related">Related tags</div>
-        <div id="relatedBar" class="flex flex-wrap gap-2 pt-1"></div>
-      </div>
-    </section>
-  </main>
+   <section id="view-tags" class="hidden space-y-3">
+  <div class="card-legacy p-3 flex items-center justify-between">
+    <h1 class="text-xl font-semibold" id="tagTitle">#tag</h1>
+    <button id="followBtn" class="btn-ghost-legacy">ติดตามแท็ก</button>
+  </div>
+
+  <div class="card-legacy p-2 flex gap-2">
+    <button class="chip-legacy" aria-pressed="true" data-tab="posts">Posts</button>
+    <button class="chip-legacy" aria-pressed="false" data-tab="places">Places</button>
+  </div>
+
+  <div id="tagResults" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+  <div class="card-legacy p-3">
+    <div class="text-sm font-semibold" data-i18n="tag.related">แท็กที่เกี่ยวข้อง</div>
+    <div id="relatedBar" class="flex flex-wrap gap-2 pt-1"></div>
+  </div>
+</section>
+
 
   <script>
     /* ======================
@@ -178,7 +214,13 @@
     /* ======================
        Mock Data
     ====================== */
-    const CURRENT_USER = { id:"u1", name:"Tammy", avatar:"https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop", frame:"pf-frame-basic", badges:["Explorer"] };
+    const CURRENT_USER = {
+  id:"u1",
+  name:"Tammy",
+  avatar:"https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
+  frame:"frame-gold",      // << เปลี่ยนให้ตรงคลาสใหม่
+  badges:["Explorer"]
+};
     const POSTS = [
       { id:"p1", user:"Pim", avatar:"https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=256&auto=format&fit=crop", frame:"pf-frame-gold",
         caption:"วันสบายๆ ที่ #ปทุมธานี แวะ #ตลาดวัดศาลเจ้า อิ่มมาก 🥰 #local_food #photo_spot", media:{type:"image", src:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop"} },
@@ -416,17 +458,28 @@
        PROFILE (frame apply)
     ====================== */
     function renderProfile(){
-      $("#meName").textContent = CURRENT_USER.name;
-      $("#meBadges").textContent = CURRENT_USER.badges.join(", ");
-      $("#meAvatar").className = `avatar ${CURRENT_USER.frame}`;
-      const frames = ["pf-frame-basic","pf-frame-pastel","pf-frame-neon","pf-frame-gold","pf-frame-leafy"];
-      $("#framePicker").innerHTML = frames.map(f=>`<button class="chip focus-ring" data-frame="${f}">${f.replace("pf-frame-","")}</button>`).join("");
-      $("#framePicker").onclick=(e)=>{
-        const b=e.target.closest("[data-frame]"); if(!b) return;
-        CURRENT_USER.frame = b.getAttribute("data-frame");
-        $("#meAvatar").className = `avatar ${CURRENT_USER.frame}`;
-      };
-    }
+  document.getElementById("meName").textContent = CURRENT_USER.name;
+  document.getElementById("meBadges").textContent = CURRENT_USER.badges.join(", ");
+  document.getElementById("avatarImg").src = CURRENT_USER.avatar;
+  document.getElementById("avatarWrap").className = `w-16 h-16 rounded-full bg-white grid place-items-center overflow-hidden ${CURRENT_USER.frame}`;
+
+  const frames = ["frame-none","frame-gold","frame-neo","frame-pastel"];
+  const picker = document.getElementById("framePicker");
+  picker.innerHTML = frames.map(f=>`<button class="chip-legacy" data-frame="${f}">${f.replace("frame-","")}</button>`).join("");
+  picker.onclick = (e)=>{
+    const b = e.target.closest("[data-frame]"); if(!b) return;
+    CURRENT_USER.frame = b.getAttribute("data-frame");
+    document.getElementById("avatarWrap").className = `w-16 h-16 rounded-full bg-white grid place-items-center overflow-hidden ${CURRENT_USER.frame}`;
+  };
+
+  // ปุ่มเปลี่ยนธีมแบนเนอร์ (ให้ mood เหมือนไฟล์เดิม)
+  const themeBox = document.getElementById("profileTheme");
+  document.getElementById("themeBasic").onclick = ()=>{ themeBox.className="h-24 theme-basic"; };
+  document.getElementById("themeForest").onclick = ()=>{ themeBox.className="h-24 theme-forest"; };
+  document.getElementById("themeSunset").onclick = ()=>{ themeBox.className="h-24 theme-sunset"; };
+  document.getElementById("themeNight").onclick = ()=>{ themeBox.className="h-24 theme-night"; };
+}
+
 
     /* ======================
        TAGS page (query param)
