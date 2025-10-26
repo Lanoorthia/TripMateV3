@@ -133,6 +133,8 @@ Never commit real secrets—use placeholders for repository distribution.
    ```
 
 ## Deployment Checklist (Vercel)
+- Ensure the project is detected as **Next.js** in Vercel Project → Settings → General. Keep the default `next build` command, leave **Output Directory** blank, and verify the Root Directory targets this repository if you are in a monorepo.
+- Remove any legacy build configuration by keeping `vercel.json` minimal (the repo already ships with a schema-only file) so Vercel does not fall back to the Static Other preset.
 - Configure all environment variables in Vercel (including WEATHER_API_KEY, OAuth secrets, storage credentials, analytics keys).
 - Run `npx prisma migrate deploy` during build or via Vercel post-deploy webhook.
 - Enable Vercel Analytics, Speed Insights, and connect Sentry/PostHog clients.
