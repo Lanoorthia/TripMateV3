@@ -41,7 +41,7 @@ if (adapter) {
   console.warn("Email magic links are disabled because the Prisma adapter is unavailable.");
 }
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   ...(adapter
     ? { adapter, session: { strategy: "database" as const } }
     : { session: { strategy: "jwt" as const } }),
