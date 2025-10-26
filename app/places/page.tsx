@@ -1,6 +1,14 @@
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getPlaces() {
+  if (!prisma) {
+    console.warn("DATABASE_URL is not configured. Returning empty places list.");
+    return [];
+  }
+
   return prisma.place.findMany({
     orderBy: { createdAt: "desc" },
     include: {

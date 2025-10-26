@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Database not configured" },
+      { status: 503 }
+    );
+  }
+
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -19,6 +26,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!prisma) {
+    return NextResponse.json(
+      { error: "Database not configured" },
+      { status: 503 }
+    );
+  }
+
   const body = await request.json();
   const { title, content, imageUrl, authorId } = body;
 

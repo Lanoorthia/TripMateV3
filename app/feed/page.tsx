@@ -1,7 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getPosts() {
+  if (!prisma) {
+    console.warn("DATABASE_URL is not configured. Returning empty posts list.");
+    return [];
+  }
+
   return prisma.post.findMany({
     orderBy: { createdAt: "desc" },
     include: {
