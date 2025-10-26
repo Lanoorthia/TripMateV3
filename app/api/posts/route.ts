@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
   const post = await prisma.post.create({
     data: {
-      authorId: body.authorId,
+      author: { connect: { id: body.authorId } },
       title: typeof body.title === "string" ? body.title : null,
       content: typeof body.content === "string" ? body.content : null,
       imageUrls,
