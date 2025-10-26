@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TripMate — โปรไฟล์</title>
+  <meta name="description" content="จัดแต่งโปรไฟล์ TripMate และเลือกกรอบโปรไฟล์ที่คุณรัก" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="profile">
+  <header class="top-nav" role="banner">
+    <div class="top-nav-inner" role="navigation" aria-label="Main">
+      <a href="index.html" class="brand" aria-label="TripMate">
+        <span class="brand-logo">T</span>
+        <span class="brand-name" data-i18n="brand.title">TripMate</span>
+      </a>
+      <div class="search-box">
+        <span aria-hidden="true">🔎</span>
+        <input id="globalSearch" type="search" data-i18n-placeholder="search.placeholder" aria-label="Search TripMate" />
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html" class="nav-link" data-nav="home" data-i18n="nav.home">หน้าแรก</a>
+        <a href="places.html" class="nav-link" data-nav="places" data-i18n="nav.places">สถานที่</a>
+        <a href="compose.html" class="nav-link" data-nav="compose" data-i18n="nav.compose">สร้างโพสต์</a>
+        <a href="profile.html" class="nav-link active" data-nav="profile" data-i18n="nav.profile">โปรไฟล์</a>
+        <a href="feedback.html" class="nav-link" data-nav="feedback" data-i18n="nav.feedback">ฟีดแบ็ก</a>
+      </nav>
+      <div class="nav-controls">
+        <button id="languageToggle" class="lang-toggle" aria-label="Language toggle">TH | EN</button>
+        <button id="themeToggle" class="theme-toggle" aria-label="Theme toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36-1.42-1.42M7.05 7.05 5.64 5.64m12.02 0-1.41 1.41M7.05 16.95l-1.41 1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <span data-i18n="nav.theme">โหมดสว่าง</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html" data-i18n="breadcrumb.home">หน้าแรก</a>
+      <span aria-hidden="true">›</span>
+      <strong data-i18n="breadcrumb.profile">โปรไฟล์</strong>
+    </div>
+
+    <section class="section-heading" style="flex-direction:column; align-items:flex-start; gap:0.75rem;">
+      <h1 data-i18n="profile.title">โปรไฟล์ของคุณ</h1>
+      <p data-i18n="profile.subtitle">ติดตามกิจกรรมล่าสุด ปรับแต่งกรอบโปรไฟล์ และดูของตกแต่งทั้งหมดที่สะสมได้</p>
+    </section>
+
+    <section class="card-grid one" style="margin-top:2rem;">
+      <article class="feed-card" id="profileCard">
+        <div class="feed-media" style="aspect-ratio:16/7;">
+          <img src="https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=1200&q=80" alt="Evening skyline" />
+        </div>
+        <div class="feed-content">
+          <div class="feed-author">
+            <div class="avatar" id="profileAvatar">
+              <img src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80" alt="User avatar" />
+            </div>
+            <div>
+              <div style="font-weight:600; font-size:1.1rem;">Tammy Wander</div>
+              <div class="badge" id="profileHandle">@tammy</div>
+            </div>
+          </div>
+          <p id="profileBio" data-i18n="profile.bio">ชอบเส้นทางลัดวิวสวย คาเฟ่ริมน้ำ และการเดินทางแบบ slow life</p>
+          <div class="bento" id="profileStats"></div>
+        </div>
+      </article>
+    </section>
+
+    <section style="margin-top:3rem;">
+      <h2 data-i18n="profile.customize">เลือกกรอบโปรไฟล์</h2>
+      <p data-i18n="profile.customizeHint">เลือกกรอบที่ใช่เพื่อสะท้อนสไตล์ของคุณ ทุกโพสต์และคอมเมนต์จะใช้กรอบนี้</p>
+      <div class="profile-customizer">
+        <div class="frame-options" id="frameOptions"></div>
+        <button id="saveFrame" class="btn-primary" data-i18n="profile.save">บันทึกการเปลี่ยนแปลง</button>
+      </div>
+    </section>
+
+    <section style="margin-top:3rem;">
+      <h2 data-i18n="profile.badgesTitle">ของตกแต่งและรางวัล</h2>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p data-i18n="footer.tagline">TripMate — แชร์ประสบการณ์เที่ยวแนวตั้งของคุณให้เพื่อนเห็นก่อนใคร</p>
+    <p>
+      <span data-i18n="footer.cta">พร้อมออกสำรวจปทุมธานี?</span>
+      <a href="compose.html" data-i18n="footer.share">สร้างโพสต์ใหม่</a>
+    </p>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+  <script src="script.js" defer></script>
+</body>
+</html>

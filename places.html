@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TripMate — Places in Pathum Thani</title>
+  <meta name="description" content="ค้นหาที่เที่ยวและคาเฟ่ในจังหวัดปทุมธานีด้วยตัวกรองที่ละเอียด" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="places">
+  <header class="top-nav" role="banner">
+    <div class="top-nav-inner" role="navigation" aria-label="Main">
+      <a href="index.html" class="brand" aria-label="TripMate">
+        <span class="brand-logo">T</span>
+        <span class="brand-name" data-i18n="brand.title">TripMate</span>
+      </a>
+      <div class="search-box">
+        <span aria-hidden="true">🔎</span>
+        <input id="globalSearch" type="search" data-i18n-placeholder="search.placeholder" aria-label="Search TripMate" />
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html" class="nav-link" data-nav="home" data-i18n="nav.home">หน้าแรก</a>
+        <a href="places.html" class="nav-link active" data-nav="places" data-i18n="nav.places">สถานที่</a>
+        <a href="compose.html" class="nav-link" data-nav="compose" data-i18n="nav.compose">สร้างโพสต์</a>
+        <a href="profile.html" class="nav-link" data-nav="profile" data-i18n="nav.profile">โปรไฟล์</a>
+        <a href="feedback.html" class="nav-link" data-nav="feedback" data-i18n="nav.feedback">ฟีดแบ็ก</a>
+      </nav>
+      <div class="nav-controls">
+        <button id="languageToggle" class="lang-toggle" aria-label="Language toggle">TH | EN</button>
+        <button id="themeToggle" class="theme-toggle" aria-label="Theme toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36-1.42-1.42M7.05 7.05 5.64 5.64m12.02 0-1.41 1.41M7.05 16.95l-1.41 1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <span data-i18n="nav.theme">โหมดสว่าง</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html" data-i18n="breadcrumb.home">หน้าแรก</a>
+      <span aria-hidden="true">›</span>
+      <strong data-i18n="breadcrumb.places">สถานที่</strong>
+    </div>
+
+    <section class="section-heading" style="align-items:flex-start; gap:1.5rem; flex-wrap:wrap;">
+      <div>
+        <h1 data-i18n="places.title">ออกสำรวจจังหวัดปทุมธานี</h1>
+        <p data-i18n="places.subtitle">กรองหาที่เที่ยว คาเฟ่ และกิจกรรมสุดพิเศษที่คัดมาให้คุณโดยเฉพาะ</p>
+      </div>
+      <button class="btn-primary" id="pathumOnly" data-i18n="places.pathumOnly">เฉพาะปทุมธานี</button>
+    </section>
+
+    <section class="filter-bar" aria-labelledby="filters-title">
+      <h2 id="filters-title" class="visually-hidden">Filters</h2>
+      <div class="filter-summary" id="activeFilters" aria-live="polite"></div>
+      <div class="filter-group">
+        <label for="placeSearch" data-i18n="places.searchLabel">ค้นหาชื่อหรือแท็ก</label>
+        <div class="search-box" style="max-width:420px;">
+          <span aria-hidden="true">🔎</span>
+          <input id="placeSearch" type="search" data-i18n-placeholder="places.searchPlaceholder" />
+        </div>
+      </div>
+      <div class="filter-inline">
+        <div>
+          <label for="provinceSelect" data-i18n="places.province">จังหวัด</label>
+          <select id="provinceSelect"></select>
+        </div>
+        <div>
+          <label for="sortSelect" data-i18n="places.sort">จัดเรียง</label>
+          <select id="sortSelect" class="sort-select">
+            <option value="match" data-i18n="places.sortMatch">Best match</option>
+            <option value="rating" data-i18n="places.sortRating">Highest rating</option>
+            <option value="new" data-i18n="places.sortNew">Newest</option>
+          </select>
+        </div>
+        <div>
+          <label for="ratingRange" data-i18n="places.rating">เรตติ้งขั้นต่ำ</label>
+          <input type="range" id="ratingRange" min="0" max="5" step="0.5" value="0" />
+          <div id="ratingValue" aria-live="polite">0.0+</div>
+        </div>
+      </div>
+      <div>
+        <p data-i18n="places.category">ประเภท</p>
+        <div id="categoryChips" class="filter-chips"></div>
+      </div>
+      <div>
+        <p data-i18n="places.tags">แท็ก</p>
+        <div id="tagChips" class="filter-chips"></div>
+      </div>
+      <button id="clearFilters" class="btn-ghost" data-i18n="places.clear">ล้างตัวกรองทั้งหมด</button>
+    </section>
+
+    <section aria-labelledby="results-title" style="margin-top:2.5rem;">
+      <div class="section-heading" style="margin-bottom:1rem;">
+        <h2 id="results-title" data-i18n="places.results">ผลการค้นหา</h2>
+        <span id="resultsCount"></span>
+      </div>
+      <div id="placesGrid" class="card-grid two"></div>
+      <div id="emptyState" class="hidden">
+        <p data-i18n="places.empty">ยังไม่พบสถานที่ตรงกับตัวกรอง ลองลดเงื่อนไขหรือดูจังหวัดใกล้เคียง</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p data-i18n="footer.tagline">TripMate — แชร์ประสบการณ์เที่ยวแนวตั้งของคุณให้เพื่อนเห็นก่อนใคร</p>
+    <p>
+      <span data-i18n="footer.cta">พร้อมออกสำรวจปทุมธานี?</span>
+      <a href="index.html" data-i18n="footer.back">กลับสู่ฟีด</a>
+    </p>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+  <script src="script.js" defer></script>
+</body>
+</html>

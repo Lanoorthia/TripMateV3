@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TripMate — ส่งฟีดแบ็ก</title>
+  <meta name="description" content="แชร์ความคิดเห็นเพื่อพัฒนา TripMate" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="feedback">
+  <header class="top-nav" role="banner">
+    <div class="top-nav-inner" role="navigation" aria-label="Main">
+      <a href="index.html" class="brand" aria-label="TripMate">
+        <span class="brand-logo">T</span>
+        <span class="brand-name" data-i18n="brand.title">TripMate</span>
+      </a>
+      <div class="search-box">
+        <span aria-hidden="true">🔎</span>
+        <input id="globalSearch" type="search" data-i18n-placeholder="search.placeholder" aria-label="Search TripMate" />
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html" class="nav-link" data-nav="home" data-i18n="nav.home">หน้าแรก</a>
+        <a href="places.html" class="nav-link" data-nav="places" data-i18n="nav.places">สถานที่</a>
+        <a href="compose.html" class="nav-link" data-nav="compose" data-i18n="nav.compose">สร้างโพสต์</a>
+        <a href="profile.html" class="nav-link" data-nav="profile" data-i18n="nav.profile">โปรไฟล์</a>
+        <a href="feedback.html" class="nav-link active" data-nav="feedback" data-i18n="nav.feedback">ฟีดแบ็ก</a>
+      </nav>
+      <div class="nav-controls">
+        <button id="languageToggle" class="lang-toggle" aria-label="Language toggle">TH | EN</button>
+        <button id="themeToggle" class="theme-toggle" aria-label="Theme toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.36 6.36-1.42-1.42M7.05 7.05 5.64 5.64m12.02 0-1.41 1.41M7.05 16.95l-1.41 1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <span data-i18n="nav.theme">โหมดสว่าง</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html" data-i18n="breadcrumb.home">หน้าแรก</a>
+      <span aria-hidden="true">›</span>
+      <strong data-i18n="breadcrumb.feedback">ฟีดแบ็ก</strong>
+    </div>
+
+    <section class="section-heading" style="flex-direction:column; align-items:flex-start; gap:0.75rem;">
+      <h1 data-i18n="feedback.title">เสียงจากคุณคือพลังของ TripMate</h1>
+      <p data-i18n="feedback.subtitle">แชร์สิ่งที่คุณชอบ ข้อเสนอแนะ หรือไอเดียใหม่ ๆ เพื่อให้ TripMate ดีขึ้นสำหรับทุกคน</p>
+    </section>
+
+    <section class="form-card" style="margin-top:2rem;">
+      <form id="feedbackForm" novalidate>
+        <div class="form-group">
+          <label for="feedbackName" data-i18n="feedback.name">ชื่อ</label>
+          <input type="text" id="feedbackName" data-i18n-placeholder="feedback.namePlaceholder" required />
+          <span id="errorName" class="hidden" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="feedbackEmail" data-i18n="feedback.email">อีเมล</label>
+          <input type="email" id="feedbackEmail" data-i18n-placeholder="feedback.emailPlaceholder" required />
+          <span id="errorEmail" class="hidden" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="feedbackMessage" data-i18n="feedback.message">ข้อเสนอแนะ</label>
+          <textarea id="feedbackMessage" rows="5" data-i18n-placeholder="feedback.messagePlaceholder" required></textarea>
+          <span id="errorMessage" class="hidden" role="alert"></span>
+        </div>
+        <button type="submit" class="btn-primary" data-i18n="feedback.submit">ส่งฟีดแบ็ก</button>
+      </form>
+    </section>
+
+    <section style="margin-top:3rem;">
+      <h2 data-i18n="feedback.history">ฟีดแบ็กล่าสุด</h2>
+      <div id="feedbackList" class="card-grid one"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p data-i18n="footer.tagline">TripMate — แชร์ประสบการณ์เที่ยวแนวตั้งของคุณให้เพื่อนเห็นก่อนใคร</p>
+    <p>
+      <span data-i18n="footer.cta">พร้อมออกสำรวจปทุมธานี?</span>
+      <a href="index.html" data-i18n="footer.back">กลับสู่ฟีด</a>
+    </p>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+  <script src="script.js" defer></script>
+</body>
+</html>
