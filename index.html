@@ -166,6 +166,14 @@
       <button class="chip">✕</button>
     </form>
     <div class="p-4 space-y-3">
+      <!-- เลือกสถานที่ -->
+      <div class="flex items-end gap-2">
+        <div class="flex-1">
+          <label class="text-sm">เลือกสถานที่</label>
+          <select id="placeSelect" class="w-full border border-gray-200 rounded-xl p-2 focus-ring"></select>
+        </div>
+        <button id="addPlaceBtn" type="button" class="chip">+ เพิ่มสถานที่</button>
+      </div>
       <label class="text-sm" data-i18n="caption">คำบรรยาย</label>
       <textarea id="cap" rows="5" class="w-full border border-gray-200 rounded-xl p-3 focus-ring"
         placeholder="พิมพ์ #แท็ก ในข้อความได้ (เช่น #ปทุมธานี #family)"></textarea>
@@ -180,6 +188,46 @@
       <div class="flex items-center justify-end gap-2 pt-2">
         <button class="chip" formmethod="dialog" data-i18n="cancel">ยกเลิก</button>
         <button id="submitPost" class="btn-solid" data-i18n="post">โพสต์</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Add Place Modal -->
+  <dialog id="placeModal" class="rounded-2xl p-0 w-[90vw] max-w-lg">
+    <form method="dialog" class="p-4 border-b border-gray-200 flex items-center justify-between">
+      <div class="font-semibold">เพิ่มสถานที่</div>
+      <button class="chip">✕</button>
+    </form>
+    <div class="p-4 space-y-3">
+      <div>
+        <label class="text-sm">ชื่อสถานที่</label>
+        <input id="plName" class="w-full border border-gray-200 rounded-xl p-2 focus-ring" placeholder="เช่น ดรีมเวิลด์"/>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-sm">จังหวัด</label>
+          <input id="plProvince" class="w-full border border-gray-200 rounded-xl p-2 focus-ring" placeholder="ปทุมธานี"/>
+        </div>
+        <div>
+          <label class="text-sm">หมวดหมู่</label>
+          <input id="plCategory" class="w-full border border-gray-200 rounded-xl p-2 focus-ring" placeholder="สวนสนุก/คาเฟ่/ธรรมชาติ"/>
+        </div>
+      </div>
+      <div>
+        <label class="text-sm">เวลาเปิดทำการ</label>
+        <input id="plHours" class="w-full border border-gray-200 rounded-xl p-2 focus-ring" placeholder="เช่น 10:00–18:00"/>
+      </div>
+      <div>
+        <label class="text-sm">แท็ก (คั่นด้วยช่องว่าง, รองรับ #)</label>
+        <input id="plTags" class="w-full border border-gray-200 rounded-xl p-2 focus-ring" placeholder="#ครอบครัว #ถ่ายรูป"/>
+      </div>
+      <div>
+        <label class="text-sm">รูปภาพ (URL)</label>
+        <input id="plPhoto" class="w-full border border-gray-200 rounded-xl p-2 focus-ring" placeholder="https://..."/>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button class="chip" formmethod="dialog">ยกเลิก</button>
+        <button id="savePlaceBtn" type="button" class="btn-solid">บันทึกสถานที่</button>
       </div>
     </div>
   </dialog>
@@ -293,6 +341,66 @@
         ratio: "4/5", likes: 7
       }
     ];
+
+    /* ===== Places (เลือก/เพิ่มสถานที่) ===== */
+    const PLACES = [
+      { id:"pl_dreamworld", name:"ดรีมเวิลด์", province:"ปทุมธานี", category:"สวนสนุก", openingHours:"10:00–17:00",
+        tags:["ครอบครัว","theme_park","เล่นเครื่องเล่น"], photo:"https://images.unsplash.com/photo-1506806732259-39c2d0268443?q=80&w=1200&auto=format&fit=crop" },
+      { id:"pl_talad_wat_sanjao", name:"ตลาดวัดศาลเจ้า", province:"ปทุมธานี", category:"ตลาด/ของกิน", openingHours:"10:00–19:00",
+        tags:["local_food","street_food","ถ่ายรูป"], photo:"https://images.unsplash.com/photo-1498654896293-37aacf113fd9?q=80&w=1200&auto=format&fit=crop" },
+      { id:"pl_river_spot", name:"ริมน้ำเจ้าพระยา (รังสิต-ปทุม)", province:"ปทุมธานี", category:"ธรรมชาติ/วิว", openingHours:"06:00–19:00",
+        tags:["วิวสวย","เดินเล่น","photo_spot"], photo:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop" }
+    ];
+
+    function populatePlaceSelect(){
+      const sel = document.getElementById("placeSelect");
+      if(!sel) return;
+      sel.innerHTML = PLACES.map(p=>`<option value="${p.id}">${p.name} · ${p.province}</option>`).join("");
+    }
+
+    // เปิดโมดัลเพิ่มสถานที่
+    document.getElementById("addPlaceBtn").onclick = () => document.getElementById("placeModal").showModal();
+
+    // บันทึกสถานที่ใหม่
+    document.getElementById("savePlaceBtn").onclick = () => {
+      const name = document.getElementById("plName").value.trim();
+      const province = document.getElementById("plProvince").value.trim() || "ปทุมธานี";
+      const category = document.getElementById("plCategory").value.trim() || "สถานที่";
+      const openingHours = document.getElementById("plHours").value.trim() || "-";
+      const tagsRaw = document.getElementById("plTags").value.trim();
+      const photo = document.getElementById("plPhoto").value.trim();
+
+      if(!name){ alert("กรอกชื่อสถานที่ก่อนนะ"); return; }
+
+      // สร้างแท็กจากคำที่ผู้ใช้กรอก (รองรับ #)
+      const tagList = [...new Set([
+        ...extractHashtags(tagsRaw),
+        ...tagsRaw.split(/\s+/).map(t=>slugifyTag(t)).filter(Boolean)
+      ])];
+
+      const pl = {
+        id: "pl_"+Date.now(),
+        name, province, category, openingHours, tags: tagList,
+        photo: photo || "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop"
+      };
+      PLACES.unshift(pl);
+      populatePlaceSelect();
+      document.getElementById("placeModal").close();
+
+      // อัปเดต tag-index จากแท็กสถานที่ (นับรวม)
+      const idx = loadTagIndex(); const now = Date.now();
+      for(const slug of tagList){
+        const cur = idx.tags[slug] || { name: slug, count:0, postIds:[], placeIds:[], updatedAt:now };
+        cur.count += 1;
+        cur.placeIds = cur.placeIds || [];
+        if(!cur.placeIds.includes(pl.id)) cur.placeIds.push(pl.id);
+        cur.updatedAt = now;
+        idx.tags[slug] = cur;
+      }
+      saveTagIndex(idx);
+      renderTrending();
+      alert("เพิ่มสถานที่เรียบร้อย!");
+    };
     const TAG_INDEX_KEY = "tripmate_tags";
     function loadTagIndex(){ try{ return JSON.parse(localStorage.getItem(TAG_INDEX_KEY)||'{"tags":{}}'); }catch{return {tags:{}}} }
     function saveTagIndex(x){ localStorage.setItem(TAG_INDEX_KEY, JSON.stringify(x)); }
@@ -329,6 +437,11 @@
             <div class="${pb}">${media}</div>
           </div>
           <div class="px-3 pb-4 -mt-2">
+            ${p.place ? `<div class="mb-2 flex flex-wrap gap-2">
+                <span class="chip">📍 ${p.place.name}</span>
+                <span class="chip">${p.place.province}</span>
+                <span class="chip">${p.place.category}</span>
+              </div>` : ``}
             <div class="text-sm text-gray-700">${linkifyHashtags(p.text)}</div>
             <div class="mt-2 flex flex-wrap gap-2">
               ${extractHashtags(p.text).map(t=>`<span class="chip">#${t}</span>`).join("")}
@@ -379,6 +492,10 @@
       e.preventDefault();
       const text = (document.getElementById("cap").value||"").trim();
       if(!text){ alert(getLang()==="th" ? "พิมพ์คำบรรยายก่อนนะ" : "Please add a caption"); return; }
+
+      const placeId = document.getElementById("placeSelect").value;
+      const place = PLACES.find(p=>p.id===placeId);
+
       const media = PREVIEW_URL
         ? { type: (document.getElementById("file").files?.[0]?.type.startsWith("video")?"video":"image"), src: PREVIEW_URL }
         : null;
@@ -387,15 +504,16 @@
         user: getLang()==="th" ? "ผู้ใช้ใหม่" : "New user",
         avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
         text,
-        media: media || { type:"image", src:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop" },
-        ratio:"4/5", likes: 0
+        media: media || { type:"image", src: place?.photo || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop" },
+        ratio:"4/5", likes: 0,
+        place: place ? { id: place.id, name: place.name, province: place.province, category: place.category } : null
       };
       POSTS.unshift(post);
       updateTagIndexFromPost(post);
       document.getElementById("cap").value="";
       document.getElementById("file").value="";
       document.getElementById("preview").innerHTML="";
-      PREVIEW_URL=null; dlg.close();
+      PREVIEW_URL=null; document.getElementById("createModal").close();
       renderDiscover();
     };
 
@@ -970,6 +1088,7 @@
     renderProfileHeader();
     renderOwnedCosmetics();
     renderSearchChips();
+    populatePlaceSelect();
     switchTab("discover");
   </script>
 </body>
