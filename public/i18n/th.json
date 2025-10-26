@@ -1,0 +1,12 @@
+{
+  "nav.tags": "แท็ก",
+  "tag.trending": "กำลังมาแรง",
+  "tag.related": "แท็กที่เกี่ยวข้อง",
+  "tag.follow": "ติดตามแท็ก",
+  "tag.following": "กำลังติดตาม",
+  "tag.results": "ผลลัพธ์",
+  "tag.posts": "โพสต์",
+  "tag.places": "สถานที่",
+  "search.byTagPlaceholder": "ค้นหาด้วย #แท็ก",
+  "empty.noResults": "ไม่พบผลลัพธ์"
+}
