@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TripMate — HTML Single File with Hashtags</title>
+  <meta name="description" content="TripMate: Vertical feed + Places + Profile ornaments + Hashtags + Trending + TH/EN + Dark/Light (HTML-only)">
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0b0b0b; --card:#f7f7f8; --muted:#6b7280; --chip:#e5e7eb; --primary:#2563eb;
+    }
+    [data-theme="dark"]{
+      --bg:#0b0b0b; --text:#f2f2f2; --card:#151515; --muted:#a1a1aa; --chip:#1f2937; --primary:#60a5fa;
+    }
+    html,body{background:var(--bg);color:var(--text);}
+    .card{background:var(--card); border:1px solid var(--chip); border-radius:18px; overflow:hidden}
+    .chip{background:var(--chip); color:var(--text); padding:.35rem .6rem; border-radius:999px; font-size:.9rem; display:inline-flex; align-items:center; gap:.25rem}
+    .chip[aria-pressed="true"]{outline:2px solid var(--primary)}
+    .nav a{padding:.35rem .6rem;border-radius:10px}
+    .nav a:hover{background:var(--chip)}
+    .avatar{width:36px;height:36px;border-radius:50%;object-fit:cover}
+    .pf-frame-basic{outline:2px solid var(--chip); outline-offset:2px}
+    .pf-frame-pastel{box-shadow:0 0 0 3px #ffd3e2 inset}
+    .pf-frame-neon{box-shadow:0 0 0 2px #22d3ee, 0 0 18px #22d3ee}
+    .pf-frame-gold{box-shadow:0 0 0 3px #d4af37 inset}
+    .pf-frame-leafy{box-shadow:0 0 0 3px #86efac inset}
+    .media{aspect-ratio:4/5;width:100%;object-fit:cover;display:block}
+    .grid3{display:grid;gap:16px;grid-template-columns:repeat(1,minmax(0,1fr))}
+    @media(min-width:700px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(min-width:1024px){.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{scrollbar-width:none}
+    .focus-ring:focus-visible{outline:2px solid var(--primary); outline-offset:2px}
+  </style>
+</head>
+<body data-theme="light" class="min-h-screen">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 border-b bg-white/70 dark:bg-black/40 backdrop-blur">
+    <div class="max-w-5xl mx-auto px-4 py-2 flex items-center gap-2">
+      <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-500 text-white grid place-items-center font-bold">T</div>
+      <nav class="nav flex items-center gap-2">
+        <a href="#" data-goto="home">Home</a>
+        <a href="#" data-goto="places">Places</a>
+        <a href="#" data-goto="compose">Compose</a>
+        <a href="#" data-goto="profile">Profile</a>
+        <a href="#" data-goto="tags">#Tags</a>
+      </nav>
+      <div class="flex-1"></div>
+      <button id="themeToggle" class="chip" aria-label="Toggle theme">🌞</button>
+      <button id="langToggle" class="chip" aria-label="Toggle language">TH</button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-5xl mx-auto px-4 py-4 space-y-6">
+    <!-- FEED -->
+    <section id="view-home" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl font-semibold" data-i18n="feed.title">Feed</h1>
+        <div class="flex gap-2">
+          <input id="feedTagQuery" class="chip focus-ring" placeholder="#ค้นหาแท็ก" aria-label="search by tag">
+          <button id="feedTagGo" class="chip">🔎</button>
+        </div>
+      </div>
+      <div class="grid3" id="feedGrid"></div>
+
+      <aside class="space-y-2">
+        <div class="text-sm font-semibold" data-i18n="tag.trending"># กำลังมาแรง</div>
+        <div class="flex flex-wrap gap-2" id="trendingBar"></div>
+      </aside>
+    </section>
+
+    <!-- COMPOSE -->
+    <section id="view-compose" class="hidden space-y-3">
+      <h1 class="text-xl font-semibold" data-i18n="compose.title">Compose</h1>
+      <div class="max-w-xl space-y-2">
+        <label class="text-sm" data-i18n="compose.caption">Caption</label>
+        <textarea id="composeCaption" rows="5" class="w-full border rounded-xl p-3 focus-ring" placeholder="พิมพ์ #แท็ก ลงในข้อความได้"></textarea>
+        <div id="suggestBar" class="flex flex-wrap gap-2"></div>
+        <label class="text-sm" data-i18n="compose.media">Media (image or video)</label>
+        <input id="composeFile" type="file" accept="image/*,video/mp4,video/webm" class="focus-ring" />
+        <div id="composePreview" class="mt-2"></div>
+        <button id="postBtn" class="px-4 py-2 rounded-xl text-white" style="background:var(--primary)" data-i18n="compose.post">Post</button>
+      </div>
+    </section>
+
+    <!-- PLACES -->
+    <section id="view-places" class="hidden space-y-3">
+      <h1 class="text-xl font-semibold" data-i18n="places.title">Places</h1>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input id="placeQuery" class="chip flex-1 focus-ring" placeholder="ค้นหาชื่อหรือ #แท็ก">
+        <select id="placeProvince" class="chip focus-ring"></select>
+      </div>
+      <div id="placeTags" class="flex flex-wrap gap-2 pt-1"></div>
+      <div class="text-sm text-[var(--muted)]" id="placeResultCount"></div>
+      <div class="grid3" id="placesGrid"></div>
+      <aside class="space-y-2">
+        <div class="text-sm font-semibold" data-i18n="tag.trending"># กำลังมาแรง</div>
+        <div id="trendingBarPlaces" class="flex flex-wrap gap-2"></div>
+      </aside>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="view-profile" class="hidden space-y-3">
+      <h1 class="text-xl font-semibold" data-i18n="profile.title">Profile</h1>
+      <div class="card p-4 flex items-center gap-3">
+        <img id="meAvatar" class="avatar pf-frame-basic" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop" alt="">
+        <div>
+          <div class="font-semibold" id="meName">Tammy</div>
+          <div class="text-sm text-[var(--muted)]" id="meBadges">Explorer</div>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm font-semibold" data-i18n="profile.frames">Profile frame</div>
+        <div id="framePicker" class="flex flex-wrap gap-2 pt-1"></div>
+      </div>
+    </section>
+
+    <!-- TAGS -->
+    <section id="view-tags" class="hidden space-y-3">
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl font-semibold" id="tagTitle">#tag</h1>
+        <button id="followBtn" class="chip">ติดตามแท็ก</button>
+      </div>
+      <div class="flex gap-2">
+        <button class="chip" aria-pressed="true" data-tab="posts">Posts</button>
+        <button class="chip" aria-pressed="false" data-tab="places">Places</button>
+      </div>
+      <div id="tagResults" class="grid3"></div>
+      <div>
+        <div class="text-sm font-semibold" data-i18n="tag.related">Related tags</div>
+        <div id="relatedBar" class="flex flex-wrap gap-2 pt-1"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* ======================
+       i18n (TH/EN)
+    ====================== */
+    const I18N = {
+      th: {
+        "feed.title":"ฟีด",
+        "compose.title":"สร้างโพสต์",
+        "compose.caption":"คำบรรยาย",
+        "compose.media":"สื่อ (ภาพ/วิดีโอ)",
+        "compose.post":"โพสต์",
+        "places.title":"สถานที่",
+        "profile.title":"โปรไฟล์",
+        "profile.frames":"กรอบโปรไฟล์",
+        "tag.trending":"กำลังมาแรง",
+        "tag.related":"แท็กที่เกี่ยวข้อง"
+      },
+      en: {
+        "feed.title":"Feed",
+        "compose.title":"Compose",
+        "compose.caption":"Caption",
+        "compose.media":"Media (image/video)",
+        "compose.post":"Post",
+        "places.title":"Places",
+        "profile.title":"Profile",
+        "profile.frames":"Profile frame",
+        "tag.trending":"Trending now",
+        "tag.related":"Related tags"
+      }
+    };
+    const getLang = ()=> localStorage.getItem("lang") || "th";
+    function applyI18N(){
+      const lang = getLang();
+      document.querySelectorAll("[data-i18n]").forEach(el=>{
+        const key = el.getAttribute("data-i18n");
+        el.textContent = I18N[lang][key] || el.textContent;
+      });
+      document.getElementById("langToggle").textContent = lang.toUpperCase();
+    }
+
+    /* ======================
+       Mock Data
+    ====================== */
+    const CURRENT_USER = { id:"u1", name:"Tammy", avatar:"https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop", frame:"pf-frame-basic", badges:["Explorer"] };
+    const POSTS = [
+      { id:"p1", user:"Pim", avatar:"https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=256&auto=format&fit=crop", frame:"pf-frame-gold",
+        caption:"วันสบายๆ ที่ #ปทุมธานี แวะ #ตลาดวัดศาลเจ้า อิ่มมาก 🥰 #local_food #photo_spot", media:{type:"image", src:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop"} },
+      { id:"p2", user:"Non", avatar:"https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?q=80&w=256&auto=format&fit=crop", frame:"pf-frame-pastel",
+        caption:"เล่นสุดมันที่ #dreamworld #theme_park #family", media:{type:"video", src:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"} },
+      { id:"p3", user:"Pete", avatar:"https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=256&auto=format&fit=crop", frame:"pf-frame-neon",
+        caption:"คาเฟ่วิวเขียว #คาเฟ่วิวดี #เชียงใหม่ #indoor", media:{type:"image", src:"https://images.unsplash.com/photo-1498654896293-37aacf113fd9?q=80&w=1200&auto=format&fit=crop"} }
+    ];
+    const PLACES = [
+      { id:"pl1", name:"Dream World", province:"ปทุมธานี", category:"สวนสนุก", tags:["dreamworld","theme_park","family","photo_spot"], ratingAvg:4.6, thumbnail:"https://images.unsplash.com/photo-1468071174046-657d9d351a40?q=80&w=1200&auto=format&fit=crop", description:"สวนสนุกยอดนิยม #ปทุมธานี #theme_park" },
+      { id:"pl2", name:"พิพิธภัณฑ์วิทยาศาสตร์ คลอง5", province:"ปทุมธานี", category:"พิพิธภัณฑ์", tags:["museum","indoor","family","คลอง5"], ratingAvg:4.4, thumbnail:"https://images.unsplash.com/photo-1469122312224-c5846569feb1?q=80&w=1200&auto=format&fit=crop", description:"#museum #ปทุมธานี #learning"},
+      { id:"pl3", name:"ตลาดริมน้ำวัดศาลเจ้า", province:"ปทุมธานี", category:"ตลาด", tags:["local_food","weekend","photo_spot"], ratingAvg:4.3, thumbnail:"https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?q=80&w=1200&auto=format&fit=crop", description:"อร่อยมาก #local_food"},
+      { id:"pl4", name:"วัดเจดีย์หอย", province:"ปทุมธานี", category:"วัด", tags:["unique","photo_spot"], ratingAvg:4.2, thumbnail:"https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=1200&auto=format&fit=crop"},
+      { id:"pl5", name:"ทุ่งบัวแดง คลอง13", province:"ปทุมธานี", category:"ธรรมชาติ", tags:["nature","outdoor","seasonal"], ratingAvg:4.1, thumbnail:"https://images.unsplash.com/photo-1528821154947-1aa3d1b749b3?q=80&w=1200&auto=format&fit=crop"},
+      { id:"pl6", name:"Zpell @ Future Park", province:"ปทุมธานี", category:"ไลฟ์สไตล์", tags:["indoor","foodie","shopping"], ratingAvg:4.5, thumbnail:"https://images.unsplash.com/photo-1520975922325-24baf2f2b42a?q=80&w=1200&auto=format&fit=crop"},
+      { id:"pl7", name:"วัดพระแก้ว", province:"กรุงเทพฯ", category:"วัด", tags:["temple","photo_spot"], ratingAvg:4.8, thumbnail:"https://images.unsplash.com/photo-1628575136966-062f9de96025?q=80&w=1200&auto=format&fit=crop"}
+    ];
+
+    /* ======================
+       Hashtag Core
+    ====================== */
+    const hashtagRegex = /(^|\s)#([A-Za-z0-9_\u0E00-\u0E7F]{2,50})/g;
+    const TAG_KEY = "tripmate_tag_index";
+    function normalizeTag(raw){
+      const clean = raw.normalize("NFC").trim().replace(/^#/,"");
+      const lower = clean.toLowerCase();
+      const kept = Array.from(lower).filter(ch=>/[a-z0-9_\u0E00-\u0E7F]/i.test(ch)).join("");
+      return kept;
+    }
+    function slugifyTag(raw){ return normalizeTag(raw); }
+    function extractHashtags(text){
+      const set=new Set(); (text||"").replace(hashtagRegex, (_m, _ws, tag)=>{
+        const s = slugifyTag(tag); if(s.length>=2 && s.length<=50) set.add(s);
+      });
+      return Array.from(set);
+    }
+    function linkifyHashtags(text){
+      return (text||"").replace(hashtagRegex, (_m, ws, tag)=>{
+        const slug = slugifyTag(tag);
+        return `${ws}<a class="chip focus-ring" href="#/tags?tag=${encodeURIComponent(slug)}">#${tag}</a>`;
+      });
+    }
+    function loadTagIndex(){
+      try{ return JSON.parse(localStorage.getItem(TAG_KEY) || `{"tags":{}}`); }catch{return {tags:{}}}
+    }
+    function saveTagIndex(idx){ localStorage.setItem(TAG_KEY, JSON.stringify(idx)); }
+    function updateTagIndex(entityType, entityId, tags /* array of {slug,name} */){
+      const idx = loadTagIndex(); const now=Date.now();
+      for(const t of tags){
+        const cur = idx.tags[t.slug] || { name:t.name, count:0, postIds:[], placeIds:[], updatedAt:now };
+        cur.name ||= t.name; cur.count += 1;
+        if(entityType==="post" && !cur.postIds.includes(entityId)) cur.postIds.push(entityId);
+        if(entityType==="place" && !cur.placeIds.includes(entityId)) cur.placeIds.push(entityId);
+        cur.updatedAt = now; idx.tags[t.slug] = cur;
+      }
+      saveTagIndex(idx);
+    }
+    function toggleFollowTag(slug, follow){
+      const idx = loadTagIndex(); if(!idx.tags[slug]) return;
+      idx.tags[slug].following = !!follow; saveTagIndex(idx);
+    }
+    function getTrendingTags(windowHours=168, limit=10){
+      const idx = loadTagIndex(); const since = Date.now()-windowHours*3600*1000;
+      return Object.entries(idx.tags)
+        .filter(([_,v])=>v.updatedAt>=since)
+        .sort((a,b)=>b[1].count-a[1].count)
+        .slice(0,limit).map(([slug,v])=>({slug,name:v.name,count:v.count,following:!!v.following}));
+    }
+    function getRelatedTags(baseSlug, limit=5){
+      const idx = loadTagIndex(); const base=idx.tags[baseSlug]; if(!base) return [];
+      const posts = new Set(base.postIds); const places = new Set(base.placeIds);
+      const score={};
+      for(const [slug,v] of Object.entries(idx.tags)){
+        if(slug===baseSlug) continue;
+        const s = v.postIds.filter(id=>posts.has(id)).length + v.placeIds.filter(id=>places.has(id)).length;
+        if(s>0) score[slug]=s;
+      }
+      return Object.entries(score).sort((a,b)=>b[1]-a[1]).slice(0,limit).map(([slug])=>({slug,name:idx.tags[slug].name}));
+    }
+
+    /* ======================
+       Helpers
+    ====================== */
+    const $ = (s)=>document.querySelector(s);
+    const $$ = (s)=>Array.from(document.querySelectorAll(s));
+    function navTo(id){
+      ["home","compose","places","profile","tags"].forEach(v=>$("#view-"+v).classList.toggle("hidden", v!==id));
+      history.replaceState(null,"","#/"+id);
+    }
+    function renderChips(tagList, container){
+      container.innerHTML = tagList.map(t=>`<a class="chip focus-ring" href="#/tags?tag=${encodeURIComponent(t)}">#${t}</a>`).join("");
+    }
+
+    /* ======================
+       Seed Tag Index (posts + places)
+    ====================== */
+    function seedIndex(){
+      POSTS.forEach(p=>{
+        updateTagIndex("post", p.id, extractHashtags(p.caption).map(slug=>({slug, name:slug})));
+      });
+      PLACES.forEach(pl=>{
+        updateTagIndex("place", pl.id, pl.tags.map(slug=>({slug, name:slug})));
+      });
+    }
+
+    /* ======================
+       FEED
+    ====================== */
+    function feedCard(p){
+      const media = p.media.type==="image"
+        ? `<img src="${p.media.src}" class="media" alt="">`
+        : `<video class="media" src="${p.media.src}" controls playsinline preload="metadata"></video>`;
+      const tags = extractHashtags(p.caption);
+      return `
+        <article class="card overflow-hidden">
+          ${media}
+          <div class="p-3">
+            <div class="flex items-center gap-2 mb-1">
+              <img class="avatar ${p.frame}" src="${p.avatar}" alt="${p.user}">
+              <strong>${p.user}</strong>
+            </div>
+            <div class="text-sm mb-2">${linkifyHashtags(p.caption)}</div>
+            <div class="flex flex-wrap gap-2">
+              ${tags.map(t=>`<a class="chip focus-ring" href="#/tags?tag=${encodeURIComponent(t)}">#${t}</a>`).join("")}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+    function renderFeed(){
+      $("#feedGrid").innerHTML = POSTS.map(feedCard).join("");
+      // trending
+      const tr = getTrendingTags();
+      $("#trendingBar").innerHTML = tr.map(t=>`<a class="chip focus-ring" href="#/tags?tag=${encodeURIComponent(t.slug)}">#${t.name} (${t.count})</a>`).join("");
+    }
+
+    /* ======================
+       COMPOSE (with tag suggestions)
+    ====================== */
+    function debounce(fn,ms=200){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms);} }
+    function bindCompose(){
+      const cap = $("#composeCaption");
+      const sug = $("#suggestBar");
+      const file = $("#composeFile");
+      const prev= $("#composePreview");
+      cap.addEventListener("input", debounce(()=>{
+        const idx = loadTagIndex(); const m = /#([A-Za-z0-9_\u0E00-\u0E7F]{1,50})$/.exec(cap.value);
+        if(!m){ sug.innerHTML=""; return;}
+        const pref = slugifyTag(m[1]);
+        const cand = Object.keys(idx.tags).filter(k=>k.startsWith(pref)).slice(0,8);
+        sug.innerHTML = cand.map(s=>`<button class="chip focus-ring" data-use="${s}">#${s}</button>`).join("");
+      },150));
+      sug.addEventListener("click",(e)=>{
+        const b=e.target.closest("[data-use]"); if(!b) return;
+        cap.value = cap.value.replace(/#([A-Za-z0-9_\u0E00-\u0E7F]{1,50})$/, `#${b.getAttribute("data-use")}`);
+        sug.innerHTML="";
+      });
+      file.addEventListener("change", ()=>{
+        prev.innerHTML=""; const f=file.files?.[0]; if(!f) return;
+        const url = URL.createObjectURL(f);
+        if(f.type.startsWith("video")){
+          prev.innerHTML = `<video src="${url}" controls playsinline class="media"></video>`;
+        }else{
+          prev.innerHTML = `<img src="${url}" class="media" alt="">`;
+        }
+      });
+      $("#postBtn").onclick=()=>{
+        const caption = cap.value.trim(); if(!caption){ alert("ใส่คำบรรยายก่อน"); return; }
+        // mock create post
+        const mediaNode = prev.querySelector("img,video");
+        const media = mediaNode
+          ? (mediaNode.tagName==="VIDEO"
+              ? {type:"video", src: mediaNode.getAttribute("src")}
+              : {type:"image", src: mediaNode.getAttribute("src")})
+          : {type:"image", src:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop"};
+        const newPost = { id: "p"+Date.now(), user: CURRENT_USER.name, avatar: CURRENT_USER.avatar, frame: CURRENT_USER.frame, caption, media };
+        POSTS.unshift(newPost);
+        // update tag index
+        const tags = extractHashtags(caption).map(slug=>({slug, name:slug}));
+        updateTagIndex("post", newPost.id, tags);
+        alert("โพสต์สำเร็จ!"); cap.value=""; prev.innerHTML=""; sug.innerHTML=""; navTo("home"); renderFeed();
+      };
+    }
+
+    /* ======================
+       PLACES (filter by tag)
+    ====================== */
+    function placeCard(pl){
+      return `
+        <article class="card">
+          <img src="${pl.thumbnail}" class="media" alt="${pl.name}">
+          <div class="p-3">
+            <div class="flex items-center justify-between">
+              <strong>${pl.name}</strong>
+              <span class="chip">⭐ ${pl.ratingAvg.toFixed(1)}</span>
+            </div>
+            <div class="text-sm text-[var(--muted)] mb-2">${pl.province} · ${pl.category}</div>
+            <div class="text-sm mb-2">${linkifyHashtags(pl.description||"")}</div>
+            <div class="flex flex-wrap gap-2">
+              ${pl.tags.map(t=>`<a class="chip focus-ring" href="#/tags?tag=${encodeURIComponent(t)}">#${t}</a>`).join("")}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+    function renderPlaces(){
+      // province options
+      const sel = $("#placeProvince");
+      const provs = ["ทั้งหมด", ...Array.from(new Set(PLACES.map(p=>p.province)))];
+      sel.innerHTML = provs.map(p=>`<option>${p}</option>`).join("");
+      // tag chips
+      const allTags = Array.from(new Set(PLACES.flatMap(p=>p.tags)));
+      renderChips(allTags, $("#placeTags"));
+      // initial grid
+      filterPlaces();
+      // trending
+      const tr = getTrendingTags();
+      $("#trendingBarPlaces").innerHTML = tr.map(t=>`<a class="chip focus-ring" href="#/tags?tag=${encodeURIComponent(t.slug)}">#${t.name}</a>`).join("");
+    }
+    function filterPlaces(){
+      const q = $("#placeQuery").value.trim();
+      const prov = $("#placeProvince").value || "ทั้งหมด";
+      const qSlug = q.startsWith("#")? slugifyTag(q.slice(1)) : null;
+      const res = PLACES.filter(pl=>{
+        const byName = !q || pl.name.includes(q);
+        const byTag = qSlug ? pl.tags.includes(qSlug) : true;
+        const byProv = prov==="ทั้งหมด" || pl.province===prov;
+        return (byName || byTag) && byProv;
+      });
+      $("#placeResultCount").textContent = `${res.length} results`;
+      $("#placesGrid").innerHTML = res.map(placeCard).join("");
+    }
+
+    /* ======================
+       PROFILE (frame apply)
+    ====================== */
+    function renderProfile(){
+      $("#meName").textContent = CURRENT_USER.name;
+      $("#meBadges").textContent = CURRENT_USER.badges.join(", ");
+      $("#meAvatar").className = `avatar ${CURRENT_USER.frame}`;
+      const frames = ["pf-frame-basic","pf-frame-pastel","pf-frame-neon","pf-frame-gold","pf-frame-leafy"];
+      $("#framePicker").innerHTML = frames.map(f=>`<button class="chip focus-ring" data-frame="${f}">${f.replace("pf-frame-","")}</button>`).join("");
+      $("#framePicker").onclick=(e)=>{
+        const b=e.target.closest("[data-frame]"); if(!b) return;
+        CURRENT_USER.frame = b.getAttribute("data-frame");
+        $("#meAvatar").className = `avatar ${CURRENT_USER.frame}`;
+      };
+    }
+
+    /* ======================
+       TAGS page (query param)
+    ====================== */
+    function readQueryTag(){ try{ const u=new URL(location.href.replace("#/tags","/tags")); return u.searchParams.get("tag")||""; }catch{return ""} }
+    function renderTagPage(){
+      const slug = readQueryTag();
+      const idx = loadTagIndex();
+      const data = idx.tags[slug];
+      const title = data ? `#${data.name} (${data.count})` : "#tags";
+      $("#tagTitle").textContent = title;
+      const btn = $("#followBtn");
+      const following = !!data?.following;
+      btn.textContent = following ? "กำลังติดตาม" : "ติดตามแท็ก";
+      btn.setAttribute("aria-pressed", following ? "true":"false");
+      btn.onclick = ()=>{ toggleFollowTag(slug, !following); renderTagPage(); };
+
+      const tabs = $$("#view-tags [data-tab]");
+      let cur="posts";
+      tabs.forEach(el=>el.onclick=()=>{ tabs.forEach(t=>t.setAttribute("aria-pressed","false")); el.setAttribute("aria-pressed","true"); cur=el.getAttribute("data-tab"); draw(); });
+
+      function draw(){
+        if(!data){ $("#tagResults").innerHTML = `<div class="text-sm text-[var(--muted)]">พิมพ์หรือคลิกชิป #แท็ก จากหน้าอื่น</div>`; $("#relatedBar").innerHTML=""; return; }
+        if(cur==="posts"){
+          const posts = POSTS.filter(p=> data.postIds?.includes(p.id));
+          $("#tagResults").innerHTML = posts.map(feedCard).join("");
+        }else{
+          const places = PLACES.filter(pl=> data.placeIds?.includes(pl.id));
+          $("#tagResults").innerHTML = places.map(placeCard).join("");
+        }
+        const rel = getRelatedTags(slug);
+        $("#relatedBar").innerHTML = rel.map(r=>`<a class="chip focus-ring" href="#/tags?tag=${encodeURIComponent(r.slug)}">#${r.name}</a>`).join("");
+      }
+      draw();
+    }
+
+    /* ======================
+       Theme & Lang
+    ====================== */
+    function initTheme(){
+      const saved = localStorage.getItem("theme") || "light";
+      document.body.setAttribute("data-theme", saved);
+      $("#themeToggle").textContent = saved==="light" ? "🌞" : "🌙";
+      $("#themeToggle").onclick=()=>{
+        const cur = document.body.getAttribute("data-theme")==="light" ? "dark" : "light";
+        document.body.setAttribute("data-theme", cur);
+        localStorage.setItem("theme", cur);
+        $("#themeToggle").textContent = cur==="light" ? "🌞" : "🌙";
+      };
+    }
+    function initLang(){
+      const saved = getLang(); localStorage.setItem("lang", saved);
+      applyI18N();
+      $("#langToggle").onclick=()=>{
+        const next = getLang()==="th" ? "en" : "th";
+        localStorage.setItem("lang", next); applyI18N();
+      };
+    }
+
+    /* ======================
+       Router (hash-based)
+    ====================== */
+    function handleRoute(){
+      const hash = location.hash || "#/home";
+      if(hash.startsWith("#/tags")){
+        navTo("tags"); renderTagPage();
+      }else if(hash.startsWith("#/compose")){
+        navTo("compose");
+      }else if(hash.startsWith("#/places")){
+        navTo("places");
+      }else if(hash.startsWith("#/profile")){
+        navTo("profile");
+      }else{
+        navTo("home");
+      }
+    }
+
+    /* ======================
+       Boot
+    ====================== */
+    // Nav buttons
+    document.querySelectorAll("[data-goto]").forEach(a=>{
+      a.addEventListener("click",(e)=>{ e.preventDefault(); const to=a.getAttribute("data-goto"); location.hash = "#/"+to; });
+    });
+
+    // Actions in views
+    $("#feedTagGo").onclick=()=>{ const q=$("#feedTagQuery").value.trim().replace(/^#/,""); if(q){ location.hash="#/tags?tag="+encodeURIComponent(slugifyTag(q)); } };
+    $("#placeQuery").addEventListener("input", ()=>filterPlaces());
+    $("#placeProvince").addEventListener("change", ()=>filterPlaces());
+
+    // Init
+    initTheme(); initLang(); seedIndex(); renderFeed(); bindCompose(); renderPlaces(); renderProfile();
+    addEventListener("hashchange", handleRoute); handleRoute();
+  </script>
+</body>
+</html>
