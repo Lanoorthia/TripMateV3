@@ -18,6 +18,13 @@
   --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.35);
 }
 
+.legacy-error {
+  padding: 4rem 1.5rem;
+  text-align: center;
+  font-size: 1.125rem;
+  color: var(--subtle);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0b1120;
