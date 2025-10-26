@@ -40,36 +40,56 @@
   </style>
 </head>
 <body class="min-h-screen">
-  <!-- Header -->
-  <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-500 text-white grid place-items-center font-bold">T</div>
-      <div class="font-semibold text-lg text-gray-900">TripMate</div>
-      <div class="flex-1"></div>
-      <button id="openCreate" class="btn" data-i18n="create">+ โพสต์รีวิว</button>
-      <button id="themeToggle" class="chip" aria-label="Toggle theme">🌞</button>
-      <button id="langToggle" class="chip" aria-label="Toggle language">TH</button>
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-40 border-b bg-white/80 backdrop-blur">
+    <div class="max-w-5xl mx-auto px-4 py-2 flex items-center gap-3">
+      <div class="flex items-center gap-2 flex-1">
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-500 text-white grid place-items-center font-bold">T</div>
+        <div class="font-extrabold tracking-tight">TripMate</div>
+        <div class="hidden sm:flex items-center gap-2 ml-3 flex-1 max-w-md rounded-full px-3 py-1.5 border bg-white/60">
+          <span>🔎</span>
+          <input id="topSearch" class="bg-transparent outline-none text-sm w-full" placeholder="ค้นหาคาเฟ่ · ที่เที่ยว · รีวิว" />
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" class="chip" aria-label="Toggle theme">🌞</button>
+        <button id="langToggle" class="chip" aria-label="Toggle language">TH</button>
+        <a href="https://forms.gle/JuJ2WWLeiRyTQSNU6" target="_blank" rel="noopener"
+           class="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition rounded-full px-4 py-1.5 text-sm">
+           ส่งฟีดแบ็ก
+        </a>
+      </div>
     </div>
   </header>
 
   <!-- Main -->
-  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-    <section id="page-discover" class="space-y-6">
-      <section class="flex flex-wrap items-center gap-2">
-        <div class="text-xl font-semibold text-gray-900" id="feedTitle" data-i18n="feed">ฟีด</div>
-        <div class="flex-1"></div>
+  <main class="max-w-5xl mx-auto px-4 py-4 pb-28 space-y-6">
+    <section id="page-discover" class="space-y-4">
+      <div class="flex flex-wrap items-center gap-3 justify-between">
+        <div class="font-semibold" id="feedTitle" data-i18n="feed">ฟีด</div>
+        <div class="flex items-center gap-2">
+          <button id="openCreatePost" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-4 py-2 text-sm">+ โพสต์รีวิว</button>
+          <button id="toggleView" class="border rounded-full px-3 py-2 text-sm">โหมด: ภาพแนวตั้ง</button>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
         <div class="hidden md:flex items-center gap-2">
           <input id="searchTag" class="chip focus-ring" placeholder="#ค้นหาแท็ก" />
           <button id="goTag" class="chip">🔎</button>
         </div>
-      </section>
+      </div>
+
+      <div id="promoBanners" class="flex gap-3 overflow-x-auto no-scrollbar"></div>
+      <div id="topTags" class="flex gap-2 overflow-x-auto no-scrollbar"></div>
 
       <section>
         <div class="text-sm font-semibold mb-2" data-i18n="trending"># กำลังมาแรง</div>
         <div id="trendingBar" class="flex flex-wrap gap-2"></div>
       </section>
 
-      <section id="feed" class="masonry"></section>
+      <section id="discoverMasonry" class="masonry"></section>
+      <section id="discoverTiles" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></section>
     </section>
 
     <section id="page-search" class="hidden space-y-3">
@@ -210,7 +230,7 @@
       document.getElementById("langToggle").onclick = ()=>{
         const next = getLang()==="th" ? "en" : "th";
         localStorage.setItem("lang", next);
-        applyI18N(); renderFeed(); renderTrending();
+        applyI18N(); renderDiscover();
       };
     }
     function initTheme(){
@@ -318,7 +338,11 @@
       `;
     }
     function renderFeed(){
-      document.getElementById("feed").innerHTML = POSTS.map(postCard).join("");
+      const container = document.getElementById("discoverMasonry");
+      if(!container) return;
+      container.innerHTML = POSTS.length
+        ? POSTS.map(postCard).join("")
+        : `<div class="text-sm text-gray-500">${getLang()==="th"?"ยังไม่มีโพสต์":"No posts yet"}</div>`;
     }
     function getTrendingTags(windowHours=168, limit=10){
       const idx = loadTagIndex(); const since = Date.now()-windowHours*3600*1000;
@@ -336,7 +360,7 @@
 
     /* ============== Compose ============== */
     const dlg = document.getElementById("createModal");
-    document.getElementById("openCreate").onclick = ()=> dlg.showModal();
+    document.getElementById("openCreatePost").onclick = ()=> dlg.showModal();
     document.getElementById("fabCreate").onclick = ()=> dlg.showModal();
     let PREVIEW_URL = null;
     document.getElementById("file").addEventListener("change", ()=>{
@@ -372,7 +396,7 @@
       document.getElementById("file").value="";
       document.getElementById("preview").innerHTML="";
       PREVIEW_URL=null; dlg.close();
-      renderFeed(); renderTrending();
+      renderDiscover();
     };
 
     document.getElementById("goTag").onclick = ()=>{
@@ -380,7 +404,9 @@
       if(!raw) return;
       const slug = slugifyTag(raw);
       const filtered = POSTS.filter(p => extractHashtags(p.text).includes(slug));
-      document.getElementById("feed").innerHTML = filtered.length
+      DISCOVER_VIEW="masonry";
+      renderDiscover();
+      document.getElementById("discoverMasonry").innerHTML = filtered.length
         ? filtered.map(postCard).join("")
         : `<div class="text-sm text-gray-500">${getLang()==="th"?"ไม่พบโพสต์ที่มีแท็กนี้":"No posts for this tag"}</div>`;
     };
@@ -432,6 +458,7 @@
     ];
 
     let TAB = "discover";
+    let DISCOVER_VIEW = "masonry";
     let QUERY = "";
     let CAT = "ทั้งหมด";
     let PROV = "ทั้งหมด";
@@ -502,6 +529,68 @@
           </div>
         </div>
       `;
+    }
+    function renderPromoBanners(){
+      const banners=[
+        {id:"bn1",title:"โทนอุ่น Cozy Café",subtitle:"เชียงใหม่กำลังฮิต",tag:"#CafeWeek",color:"from-rose-100 to-amber-50",emoji:"☕"},
+        {id:"bn2",title:"ธรรมชาติอากาศดี",subtitle:"รวมพิกัดถ่ายรูป",tag:"#NatureNow",color:"from-emerald-100 to-sky-100",emoji:"🌿"},
+        {id:"bn3",title:"#เมืองรองกำลังมา",subtitle:"ที่ใหม่คนยังไม่เยอะ",tag:"#HiddenGems",color:"from-indigo-100 to-fuchsia-100",emoji:"📍"}
+      ];
+      const container=$("#promoBanners");
+      if(!container) return;
+      container.innerHTML=banners.map(b=>`
+        <div class="min-w-[260px] rounded-2xl p-4 border bg-gradient-to-br ${b.color}">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-xs text-gray-600">แนะนำ</div>
+              <div class="font-semibold leading-tight">${b.title}</div>
+              <div class="text-[12px] text-gray-600">${b.subtitle}</div>
+            </div>
+            <div class="text-xl">${b.emoji}</div>
+          </div>
+          <div class="mt-2">
+            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs border bg-white/60">${b.tag}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+    function renderTopTags(){
+      const tags=["#คาเฟ่วิวดี","#ธรรมชาติ","#ครอบครัว","#ถ่ายรูป","#เมืองรอง","#ทะเล","#ภูเขา"];
+      const container=$("#topTags");
+      if(!container) return;
+      container.innerHTML=tags.map(t=>`
+        <button class="inline-flex items-center rounded-full px-3 py-1.5 text-xs border bg-white hover:bg-gray-50 whitespace-nowrap">${t}</button>
+      `).join("");
+    }
+    function renderDiscoverTiles(){
+      const container=$("#discoverTiles");
+      if(!container) return;
+      const map=latestByPlace();
+      const placesList=filteredPlaces();
+      container.innerHTML=placesList.length
+        ? placesList.map(p=>{
+            const review=map[p.id];
+            const dist=userLoc?fmtKm(kmDist(userLoc.lat,userLoc.lng,p.lat,p.lng)):null;
+            return tileCard(p, review, dist);
+          }).join("")
+        : `<p class="text-sm text-gray-500 col-span-full">ยังไม่มีสถานที่แนะนำ</p>`;
+    }
+    function renderDiscover(){
+      renderFeed();
+      renderTrending();
+      const masonry=$("#discoverMasonry");
+      const tiles=$("#discoverTiles");
+      const toggleBtn=$("#toggleView");
+      if(DISCOVER_VIEW==="tiles"){
+        renderDiscoverTiles();
+        setHidden(masonry, true);
+        setHidden(tiles, false);
+        if(toggleBtn) toggleBtn.textContent="โหมด: สรุปสถานที่";
+      }else{
+        setHidden(masonry, false);
+        setHidden(tiles, true);
+        if(toggleBtn) toggleBtn.textContent="โหมด: ภาพแนวตั้ง";
+      }
     }
     function renderSearchChips(){
       const cats=["ทั้งหมด","คาเฟ่","ธรรมชาติ","ที่พัก","ร้านอาหาร","แลนด์มาร์ก"];
@@ -806,21 +895,44 @@
     const openDetail = (place)=>{ renderDetail(place); setHidden($("#detailModal"), false); };
     const closeDetail = ()=> setHidden($("#detailModal"), true);
     $("#closeDetail").onclick=closeDetail;
-    $$("nav [data-tab]").forEach(btn=>{
-      btn.onclick=()=>{
-        TAB=btn.dataset.tab;
-        ["discover","search","groups","rewards","profile"].forEach(id=>setHidden($("#page-"+id), id!==TAB));
-        btn.parentElement.querySelectorAll("button").forEach(b=>{
-          b.classList.toggle("text-blue-600", b===btn);
-          b.classList.toggle("text-gray-600", b!==btn);
-        });
-        if(TAB==="search"){ renderSearchChips(); renderSearchResults(); }
-        if(TAB==="groups"){ renderGroups(); }
-        if(TAB==="rewards"){ renderRewards(); }
-        if(TAB==="profile"){ renderProfileHeader(); renderOwnedCosmetics(); }
-      };
+    const navButtons=$$("nav [data-tab]");
+    function switchTab(tab){
+      TAB=tab;
+      ["discover","search","groups","rewards","profile"].forEach(id=>setHidden($("#page-"+id), id!==TAB));
+      navButtons.forEach(btn=>{
+        const active = btn.dataset.tab===TAB;
+        btn.classList.toggle("text-blue-600", active);
+        btn.classList.toggle("text-gray-600", !active);
+      });
+      if(TAB==="discover"){ renderDiscover(); }
+      if(TAB==="search"){ renderSearchChips(); renderSearchResults(); }
+      if(TAB==="groups"){ renderGroups(); }
+      if(TAB==="rewards"){ renderRewards(); }
+      if(TAB==="profile"){ renderProfileHeader(); renderOwnedCosmetics(); }
+    }
+    navButtons.forEach(btn=>{
+      btn.onclick=()=> switchTab(btn.dataset.tab);
     });
 
+    const toggleViewBtn=$("#toggleView");
+    if(toggleViewBtn){
+      toggleViewBtn.onclick=()=>{
+        DISCOVER_VIEW = DISCOVER_VIEW==="masonry" ? "tiles" : "masonry";
+        renderDiscover();
+      };
+    }
+    const topSearchEl=document.getElementById("topSearch");
+    if(topSearchEl){
+      topSearchEl.addEventListener("keydown",(e)=>{
+        if(e.key==="Enter"){
+          const value=e.target.value.trim();
+          switchTab("search");
+          $("#searchInput").value=value;
+          QUERY=value;
+          renderSearchResults();
+        }
+      });
+    }
     document.body.addEventListener("click",(e)=>{
       const t=e.target.closest("[data-act]");
       if(!t) return;
@@ -842,6 +954,7 @@
         userLoc={lat:pos.coords.latitude,lng:pos.coords.longitude};
         $("#locInfo").textContent="ใช้งานตำแหน่งใกล้คุณ";
         renderSearchResults();
+        renderDiscover();
       }, ()=>{
         $("#locInfo").textContent="ไม่สามารถใช้ตำแหน่งได้ จะแสดงผลตามคะแนนนิยมแทน";
       }, {enableHighAccuracy:true, timeout:7000});
@@ -851,13 +964,13 @@
 
     initTheme();
     initLang();
-    renderFeed();
-    renderTrending();
-    renderSearchChips();
-    renderGroups();
+    renderPromoBanners();
+    renderTopTags();
     renderRewards();
     renderProfileHeader();
     renderOwnedCosmetics();
+    renderSearchChips();
+    switchTab("discover");
   </script>
 </body>
 </html>
