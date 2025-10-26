@@ -1,0 +1,108 @@
+<!-- What's new: Profile hub with ornament frames, live preview, and persistent customization controls. -->
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TripMate — Profile</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-page="profile">
+    <header class="tm-top-nav" data-preserve="nav">
+      <!-- preserved from original design -->
+      <div class="tm-brand">
+        <a href="index.html" class="tm-logo" data-i18n="nav.brand">TripMate</a>
+      </div>
+      <nav class="tm-nav-links" aria-label="Main navigation">
+        <a href="index.html" class="tm-nav-link" data-route="home" data-i18n="nav.home"></a>
+        <a href="places.html" class="tm-nav-link" data-route="places" data-i18n="nav.places"></a>
+        <a href="compose.html" class="tm-nav-link" data-route="compose" data-i18n="nav.compose"></a>
+        <a href="profile.html" class="tm-nav-link" data-route="profile" data-i18n="nav.profile"></a>
+        <a href="feedback.html" class="tm-nav-link" data-route="feedback" data-i18n="nav.feedback"></a>
+      </nav>
+      <div class="tm-actions">
+        <button class="tm-icon-btn" type="button" id="theme-toggle" aria-label="Toggle theme"></button>
+        <div class="tm-language-switch" role="group" aria-label="Language selector">
+          <button type="button" data-lang="th" class="tm-lang-btn">TH</button>
+          <button type="button" data-lang="en" class="tm-lang-btn">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="tm-main" tabindex="-1">
+      <nav class="tm-breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="index.html" data-i18n="nav.home"></a></li>
+          <li aria-current="page" data-i18n="profile.title"></li>
+        </ol>
+      </nav>
+
+      <section class="tm-profile-hero">
+        <div class="tm-profile-avatar" id="profile-avatar">
+          <img src="assets/images/placeholder-2.svg" alt="" />
+        </div>
+        <div class="tm-profile-details">
+          <h1 data-i18n="profile.heading"></h1>
+          <p data-i18n="profile.bio"></p>
+          <div class="tm-profile-badges" id="profile-badges"></div>
+        </div>
+      </section>
+
+      <section class="tm-tabs">
+        <div class="tm-tablist" role="tablist">
+          <button class="tm-tab" data-tab="overview" role="tab" aria-selected="true" data-i18n="profile.overview"></button>
+          <button class="tm-tab" data-tab="customize" role="tab" aria-selected="false" data-i18n="profile.customize"></button>
+        </div>
+        <div class="tm-tab-panels">
+          <div class="tm-tab-panel" data-panel="overview" role="tabpanel">
+            <h2 data-i18n="profile.recent"></h2>
+            <div id="profile-recent" class="tm-profile-grid"></div>
+          </div>
+          <div class="tm-tab-panel" data-panel="customize" role="tabpanel" hidden>
+            <h2 data-i18n="profile.frames"></h2>
+            <p data-i18n="profile.framesHint"></p>
+            <div class="tm-frame-grid" id="frame-options">
+              <button type="button" class="tm-frame-option pf-frame-basic" data-frame="pf-frame-basic">
+                <span data-i18n="profile.frameBasic"></span>
+              </button>
+              <button type="button" class="tm-frame-option pf-frame-pastel" data-frame="pf-frame-pastel">
+                <span data-i18n="profile.framePastel"></span>
+              </button>
+              <button type="button" class="tm-frame-option pf-frame-neon" data-frame="pf-frame-neon">
+                <span data-i18n="profile.frameNeon"></span>
+              </button>
+              <button type="button" class="tm-frame-option pf-frame-gold" data-frame="pf-frame-gold">
+                <span data-i18n="profile.frameGold"></span>
+              </button>
+              <button type="button" class="tm-frame-option pf-frame-leafy" data-frame="pf-frame-leafy">
+                <span data-i18n="profile.frameLeafy"></span>
+              </button>
+            </div>
+            <div class="tm-frame-preview">
+              <div class="tm-profile-avatar" id="frame-preview">
+                <img src="assets/images/placeholder-2.svg" alt="" />
+              </div>
+              <button class="tm-primary-btn" type="button" id="save-frame" data-i18n="profile.save"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="tm-footer">
+      <p data-i18n="footer.copy"></p>
+    </footer>
+
+    <template id="profile-card-template">
+      <article class="tm-mini-card">
+        <div class="tm-mini-media"></div>
+        <div class="tm-mini-body">
+          <p class="tm-mini-title"></p>
+          <p class="tm-mini-meta"></p>
+        </div>
+      </article>
+    </template>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

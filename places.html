@@ -1,0 +1,129 @@
+<!-- What's new: Expanded discovery page with responsive filters, Pathum Thani quick filter, and accessible results grid. -->
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TripMate — Places</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-page="places">
+    <header class="tm-top-nav" data-preserve="nav">
+      <!-- preserved from original design -->
+      <div class="tm-brand">
+        <a href="index.html" class="tm-logo" data-i18n="nav.brand">TripMate</a>
+      </div>
+      <nav class="tm-nav-links" aria-label="Main navigation">
+        <a href="index.html" class="tm-nav-link" data-route="home" data-i18n="nav.home"></a>
+        <a href="places.html" class="tm-nav-link" data-route="places" data-i18n="nav.places"></a>
+        <a href="compose.html" class="tm-nav-link" data-route="compose" data-i18n="nav.compose"></a>
+        <a href="profile.html" class="tm-nav-link" data-route="profile" data-i18n="nav.profile"></a>
+        <a href="feedback.html" class="tm-nav-link" data-route="feedback" data-i18n="nav.feedback"></a>
+      </nav>
+      <div class="tm-actions">
+        <button class="tm-icon-btn" type="button" id="theme-toggle" aria-label="Toggle theme"></button>
+        <div class="tm-language-switch" role="group" aria-label="Language selector">
+          <button type="button" data-lang="th" class="tm-lang-btn">TH</button>
+          <button type="button" data-lang="en" class="tm-lang-btn">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="tm-main" tabindex="-1">
+      <nav class="tm-breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="index.html" data-i18n="nav.home"></a></li>
+          <li aria-current="page" data-i18n="places.title"></li>
+        </ol>
+      </nav>
+
+      <header class="tm-page-head">
+        <div>
+          <h1 data-i18n="places.heading"></h1>
+          <p data-i18n="places.subheading"></p>
+        </div>
+        <div class="tm-page-actions">
+          <button class="tm-secondary-btn" type="button" id="pathum-only" data-i18n="places.quickFilter"></button>
+        </div>
+      </header>
+
+      <section class="tm-filters" aria-labelledby="filter-title">
+        <div class="tm-filter-head">
+          <h2 id="filter-title" data-i18n="places.filterTitle"></h2>
+          <button class="tm-ghost-btn" id="clear-all" type="button" data-i18n="places.clear"></button>
+        </div>
+        <form id="places-form" class="tm-filter-grid">
+          <label class="tm-input-group">
+            <span data-i18n="places.searchLabel"></span>
+            <input type="search" id="search-places" placeholder="" autocomplete="off" data-i18n-placeholder="places.searchPlaceholder" />
+          </label>
+          <label class="tm-input-group">
+            <span data-i18n="places.province"></span>
+            <select id="province-filter">
+              <option value="all" data-i18n="places.provinceAll"></option>
+              <option value="ปทุมธานี">ปทุมธานี</option>
+              <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+              <option value="นนทบุรี">นนทบุรี</option>
+            </select>
+          </label>
+          <fieldset class="tm-input-group">
+            <legend data-i18n="places.category"></legend>
+            <div class="tm-chip-group" id="category-chips"></div>
+          </fieldset>
+          <fieldset class="tm-input-group">
+            <legend data-i18n="places.tags"></legend>
+            <div class="tm-chip-group" id="tag-chips"></div>
+          </fieldset>
+          <label class="tm-input-group tm-slider">
+            <span data-i18n="places.rating"></span>
+            <input type="range" id="rating-range" min="0" max="5" step="0.5" value="0" />
+            <div class="tm-slider-value">
+              <span data-i18n="places.ratingMin"></span>
+              <span id="rating-value">0</span>
+            </div>
+          </label>
+          <label class="tm-input-group">
+            <span data-i18n="places.sort"></span>
+            <select id="sort-select">
+              <option value="match" data-i18n="places.sortMatch"></option>
+              <option value="rating" data-i18n="places.sortRating"></option>
+              <option value="new" data-i18n="places.sortNew"></option>
+            </select>
+          </label>
+        </form>
+        <div class="tm-active-filters" id="active-filters" aria-live="polite"></div>
+      </section>
+
+      <section class="tm-results" aria-live="polite">
+        <header class="tm-section-head">
+          <div>
+            <h2 data-i18n="places.results"></h2>
+            <p class="tm-section-sub"><span id="results-count">0</span> <span data-i18n="places.resultsSuffix"></span></p>
+          </div>
+        </header>
+        <div class="tm-places-grid" id="places-grid"></div>
+        <p class="tm-empty" id="no-results" hidden data-i18n="places.empty"></p>
+      </section>
+    </main>
+
+    <footer class="tm-footer">
+      <p data-i18n="footer.copy"></p>
+    </footer>
+
+    <template id="place-card-template">
+      <article class="tm-place-card" tabindex="0">
+        <div class="tm-place-media"></div>
+        <div class="tm-place-body">
+          <div class="tm-place-header">
+            <h3 class="tm-place-name"></h3>
+            <span class="tm-place-rating"></span>
+          </div>
+          <p class="tm-place-meta"></p>
+          <p class="tm-place-tags"></p>
+        </div>
+      </article>
+    </template>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
