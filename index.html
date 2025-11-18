@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TripMate — Lifestyle Social Prototype (Vertical Feed)</title>
-  <meta name="description" content="TripMate: ฟีดแนวตั้งเหมือน IG/Lemon8 + ค้นหา + กลุ่มโหวต + สรุปทริป + รางวัล/ของตกแต่งโปรไฟล์ + โปรไฟล์ + ส่งฟีดแบ็ก (Google Form)" />
+  <title>TripMate — Prototype3 </title>
+  <meta name="description" content="gfbomk'ร่วมเดินทางไปพร้อมกับสร้างความทรงจำดีๆ กับ TripMate " />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* ซ่อนสกอร์ลบาร์แนวนอน */
@@ -13,7 +13,7 @@
     /* line clamp */
     .line-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .line-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-    /* Lemon8-like masonry: ใช้ CSS columns + break-inside */
+    /* ใช้ CSS columns + break-inside */
     .masonry { column-count: 2; column-gap: 0.75rem; }
     @media (min-width:640px){ .masonry { column-count: 3; } }
     @media (min-width:1024px){ .masonry { column-count: 4; } }
@@ -57,9 +57,9 @@
     <!-- DISCOVER -->
     <section id="page-discover" class="space-y-4">
       <div class="flex items-center justify-between">
-        <div class="font-semibold">สำหรับคุณ (For you)</div>
+        <div class="font-semibold">สำหรับคุณ</div>
         <div class="flex items-center gap-2">
-          <button id="openCreatePost" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-4 py-2 text-sm">+ โพสต์รีวิว</button>
+          <button id="openCreatePost" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-4 py-2 text-sm">เพิ่มโพสต์</button>
           <button id="toggleView" class="border rounded-full px-3 py-2 text-sm">โหมด: ภาพแนวตั้ง</button>
         </div>
       </div>
@@ -86,7 +86,7 @@
       <div id="categoryChips" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
       <div id="provinceChips" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
       <div class="flex items-center gap-3 text-sm text-gray-600">
-        <span>🧭 ระยะทางสูงสุด:</span> <span id="distVal">80</span> กม.
+        <span>ระยะทางสูงสุด:</span> <span id="distVal">80</span> กม.
       </div>
       <input id="distSlider" type="range" min="5" max="200" step="5" value="80" class="w-full accent-blue-600" />
       <div id="locInfo" class="text-xs text-gray-500"></div>
@@ -196,7 +196,7 @@
           <label class="text-sm">รีวิว</label>
           <textarea id="createText" rows="4" class="w-full border rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="เล่าประสบการณ์สั้น ๆ ของคุณ"></textarea>
         </div>
-        <div id="verifyHint" class="text-sm text-gray-500">* เปิดตำแหน่งใกล้สถานที่เพื่อรับสถานะ Verified</div>
+        <div id="verifyHint" class="text-sm text-gray-500">* เปิดตำแหน่งเพื่อค้นหาสถานที่ใกล้เคียง</div>
         <div class="flex items-center justify-end gap-2">
           <button id="cancelCreate" class="border rounded-2xl px-4 py-2">ยกเลิก</button>
           <button id="submitCreate" class="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-4 py-2">โพสต์</button>
@@ -420,7 +420,7 @@
       }).join(""):`<p class="text-sm text-gray-500">ไม่พบผลลัพธ์ตามตัวกรอง</p>`;
     }
 
-    // -------- Groups (เหมือนเดิม ย่อให้อ่านง่าย) --------
+    // -------- Groups --------
     function renderGroups(){
       const c=$("#groupContainer");
       if(c.getAttribute("data-group")==="1"){
@@ -476,7 +476,7 @@
           }).join("")}
           <div class="flex items-center justify-between pt-2">
             <div class="text-sm text-gray-500">กดสรุปเพื่อสร้าง Trip Plan (One-click)</div>
-            <button id="confirmTripBtn" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-3 py-1.5">🗺️ สรุปทริป</button>
+            <button id="confirmTripBtn" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-3 py-1.5">สรุปทริป</button>
           </div>
         </div>
         <div id="tripSummary"></div>
@@ -772,7 +772,7 @@
       const verified=userLoc?kmDist(userLoc.lat,userLoc.lng,p.lat,p.lng)<=1:false;
       $("#verifyHint").innerHTML=verified?
         `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs bg-gray-100">✔︎ Verified Visitor (GPS)</span>`:
-        `* เปิดตำแหน่งใกล้สถานที่เพื่อรับสถานะ Verified`;
+        `* เปิดตำแหน่งเพื่อค้นหาสถานที่ใกล้เคียง`;
     }
 
     // top search → ไปหน้า search
